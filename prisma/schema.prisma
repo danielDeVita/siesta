@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+  PAYMENT_FAILED
+}
+
+enum Currency {
+  ARS
+}
+
+enum PaymentProvider {
+  MERCADO_PAGO
+}
+
+enum PaymentProcessStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  ERROR
+}
+
+enum InventoryMovementType {
+  ORDER_CONFIRM
+  ORDER_CANCEL_RESTORE
+  MANUAL_ADJUSTMENT
+}
+
+model AdminUser {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  passwordHash       String              @map("password_hash")
+  role               AdminRole           @default(ADMIN)
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  products           Product[]
+  inventoryMovements InventoryMovement[]
+
+  @@map("admin_users")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Collection {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("collections")
+}
+
+model Product {
+  id                 String              @id @default(cuid())
+  slug               String              @unique
+  title              String
+  description        String?
+  measurements       String?
+  priceArs           Int                 @map("price_ars")
+  stock              Int
+  status             ProductStatus       @default(ACTIVE)
+  categoryId         String?             @map("category_id")
+  collectionId       String?             @map("collection_id")
+  createdByAdminId   String              @map("created_by_admin_id")
+  createdByAdmin     AdminUser           @relation(fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  category           Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  collection         Collection?         @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  images             ProductImage[]
+  orderItems         OrderItem[]
+  inventoryMovements InventoryMovement[]
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  url       String
+  altText   String? @map("alt_text")
+  sortOrder Int     @default(0) @map("sort_order")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, sortOrder])
+  @@map("product_images")
+}
+
+model Order {
+  id               String         @id @default(cuid())
+  publicCode       String         @unique @map("public_code")
+  status           OrderStatus    @default(PENDING_PAYMENT)
+  customerName     String         @map("customer_name")
+  customerEmail    String         @map("customer_email")
+  customerWhatsapp String         @map("customer_whatsapp")
+  pickupNotes      String?        @map("pickup_notes")
+  currency         Currency       @default(ARS)
+  subtotalAmount   Int            @map("subtotal_amount")
+  totalAmount      Int            @map("total_amount")
+  mpPreferenceId   String?        @map("mp_preference_id")
+  mpPaymentId      String?        @map("mp_payment_id")
+  paidAt           DateTime?      @map("paid_at")
+  items            OrderItem[]
+  paymentEvents    PaymentEvent[]
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String              @id @default(cuid())
+  orderId             String              @map("order_id")
+  productId           String?             @map("product_id")
+  productNameSnapshot String              @map("product_name_snapshot")
+  unitPriceSnapshot   Int                 @map("unit_price_snapshot")
+  quantity            Int
+  lineTotal           Int                 @map("line_total")
+  order               Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product             Product?            @relation(fields: [productId], references: [id], onDelete: SetNull)
+  inventoryMovements  InventoryMovement[]
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model PaymentEvent {
+  id              String               @id @default(cuid())
+  orderId         String?              @map("order_id")
+  provider        PaymentProvider      @default(MERCADO_PAGO)
+  externalEventId String               @unique @map("external_event_id")
+  eventType       String               @map("event_type")
+  payloadJson     Json                 @map("payload_json")
+  processedAt     DateTime?            @map("processed_at")
+  processStatus   PaymentProcessStatus @default(RECEIVED) @map("process_status")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  order           Order?               @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@map("payment_events")
+}
+
+model InventoryMovement {
+  id               String                @id @default(cuid())
+  productId        String                @map("product_id")
+  orderItemId      String?               @map("order_item_id")
+  type             InventoryMovementType
+  delta            Int
+  reason           String?
+  createdByAdminId String?               @map("created_by_admin_id")
+  createdAt        DateTime              @default(now()) @map("created_at")
+  product          Product               @relation(fields: [productId], references: [id], onDelete: Restrict)
+  orderItem        OrderItem?            @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  createdByAdmin   AdminUser?            @relation(fields: [createdByAdminId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([orderItemId])
+  @@map("inventory_movements")
+}
