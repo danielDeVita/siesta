@@ -43,7 +43,7 @@ export function ThemeToggle() {
         title="Modo claro"
         aria-pressed={theme === "light"}
       >
-        <Image src={lightImg} alt="" width={18} height={18} className="theme-toggle-icon" />
+        <Image src={lightImg} alt="" width={28} height={28} className="theme-toggle-icon" />
       </button>
 
       <button
@@ -52,7 +52,7 @@ export function ThemeToggle() {
         title="Sistema"
         aria-pressed={theme === "system"}
       >
-        <Image src={systemImg} alt="" width={18} height={18} className="theme-toggle-icon" />
+        <Image src={systemImg} alt="" width={28} height={28} className="theme-toggle-icon" />
       </button>
 
       <button
@@ -61,7 +61,7 @@ export function ThemeToggle() {
         title="Modo oscuro"
         aria-pressed={theme === "dark"}
       >
-        <Image src={darkImg} alt="" width={18} height={18} className="theme-toggle-icon" />
+        <Image src={darkImg} alt="" width={28} height={28} className="theme-toggle-icon" />
       </button>
     </div>
   );
