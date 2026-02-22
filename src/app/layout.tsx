@@ -30,8 +30,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     prisma.collection.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
   ]);
 
+  const themeScript = `(function(){var t=localStorage.getItem('siesta-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');})();`;
+
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${bodyFont.variable} ${displayFont.variable}`}>
         <CartProvider>
           <div className="main-layout">

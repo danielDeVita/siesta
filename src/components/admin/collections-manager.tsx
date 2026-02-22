@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ConfirmModal } from "@/components/confirm-modal";
 
 type Collection = {
   id: string;
@@ -18,6 +19,7 @@ export function CollectionsManager({ collections: initialCollections }: Props) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null);
   const router = useRouter();
 
   const logout = async () => {
@@ -51,9 +53,6 @@ export function CollectionsManager({ collections: initialCollections }: Props) {
   };
 
   const deleteCollection = async (id: string) => {
-    const confirmed = window.confirm("¿Eliminar colección? Los productos que la tenían quedarán sin colección.");
-    if (!confirmed) return;
-
     const response = await fetch(`/api/admin/collections/${id}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
     if (!response.ok) {
@@ -61,6 +60,14 @@ export function CollectionsManager({ collections: initialCollections }: Props) {
       return;
     }
     setCollections((current) => current.filter((c) => c.id !== id));
+  };
+
+  const confirmDeleteCollection = (collection: { id: string; name: string }) => {
+    setPending({
+      title: "Eliminar colección",
+      description: `¿Eliminar "${collection.name}"? Los productos que la tenían quedarán sin colección. Esta acción no se puede deshacer.`,
+      onConfirm: () => { deleteCollection(collection.id); setPending(null); },
+    });
   };
 
   return (
@@ -129,7 +136,7 @@ export function CollectionsManager({ collections: initialCollections }: Props) {
                   <td>{collection.name}</td>
                   <td className="muted">{collection.slug}</td>
                   <td>
-                    <button className="button button-ghost" onClick={() => deleteCollection(collection.id)}>
+                    <button className="button button-ghost" onClick={() => confirmDeleteCollection(collection)}>
                       Eliminar
                     </button>
                   </td>
@@ -146,6 +153,13 @@ export function CollectionsManager({ collections: initialCollections }: Props) {
           </table>
         </div>
       </section>
+      <ConfirmModal
+        open={pending !== null}
+        title={pending?.title ?? ""}
+        description={pending?.description ?? ""}
+        onConfirm={pending?.onConfirm ?? (() => {})}
+        onCancel={() => setPending(null)}
+      />
     </section>
   );
 }

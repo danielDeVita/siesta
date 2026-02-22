@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ConfirmModal } from "@/components/confirm-modal";
 
 type Category = {
   id: string;
@@ -18,6 +19,7 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null);
   const router = useRouter();
 
   const logout = async () => {
@@ -51,9 +53,6 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
   };
 
   const deleteCategory = async (id: string) => {
-    const confirmed = window.confirm("¿Eliminar categoría? Los productos que la tenían quedarán sin categoría.");
-    if (!confirmed) return;
-
     const response = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
     if (!response.ok) {
@@ -61,6 +60,14 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
       return;
     }
     setCategories((current) => current.filter((c) => c.id !== id));
+  };
+
+  const confirmDeleteCategory = (category: { id: string; name: string }) => {
+    setPending({
+      title: "Eliminar categoría",
+      description: `¿Eliminar "${category.name}"? Los productos que la tenían quedarán sin categoría. Esta acción no se puede deshacer.`,
+      onConfirm: () => { deleteCategory(category.id); setPending(null); },
+    });
   };
 
   return (
@@ -129,7 +136,7 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
                   <td>{category.name}</td>
                   <td className="muted">{category.slug}</td>
                   <td>
-                    <button className="button button-ghost" onClick={() => deleteCategory(category.id)}>
+                    <button className="button button-ghost" onClick={() => confirmDeleteCategory(category)}>
                       Eliminar
                     </button>
                   </td>
@@ -146,6 +153,13 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
           </table>
         </div>
       </section>
+      <ConfirmModal
+        open={pending !== null}
+        title={pending?.title ?? ""}
+        description={pending?.description ?? ""}
+        onConfirm={pending?.onConfirm ?? (() => {})}
+        onCancel={() => setPending(null)}
+      />
     </section>
   );
 }

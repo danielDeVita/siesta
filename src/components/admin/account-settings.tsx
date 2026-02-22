@@ -91,6 +91,12 @@ export function AccountSettings({ currentEmail }: Props) {
           <button className="button button-ghost" onClick={() => router.push("/admin/products")}>
             Ver productos
           </button>
+          <button className="button button-ghost" onClick={() => router.push("/admin/categories")}>
+            Categorías
+          </button>
+          <button className="button button-ghost" onClick={() => router.push("/admin/collections")}>
+            Colecciones
+          </button>
           <button className="button button-ghost" onClick={() => router.push("/admin/orders")}>
             Ver pedidos
           </button>

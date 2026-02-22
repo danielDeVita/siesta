@@ -1,45 +1,50 @@
 /* ================================================================
-   SIESTA — Pink Artisan Design System
-   Paleta: blush × rose × fuchsia × raspberry × mauve
+   SIESTA — Glam Design System
+   Paleta: Provincial Pink × Beauty Bush × Gold × Near-Black
    Tipografía: Playfair Display (display) + DM Sans (body)
    ================================================================ */
 
 :root {
-  /* Fondo — blush muy suave */
-  --bg: #FFF0F5;
+  /* Fondo — blush cálido (Provincial Pink ultraligero) */
+  --bg: #FDF5F0;
   --surface: #FFFFFF;
-  --surface-soft: #FFE0EE;
-  --surface-strong: #E05585;
+  --surface-soft: #F5E4DA;
+  --surface-strong: #C87070;
 
   /* Texto */
-  --ink: #1A0812;
-  --muted-color: #9A6478;
+  --ink: #1C1410;
+  --muted-color: #8A6860;
 
-  /* Acento principal — rose vibrante */
-  --accent: #E05585;
-  --accent-strong: #C23568;
-  --accent-light: #FFE8F2;
+  /* Acento — Beauty Bush (rosa empolvado cálido) */
+  --accent: #CC7070;
+  --accent-strong: #A85050;
+  --accent-light: #FAEAE6;
 
-  /* Estado positivo — salvia (contraste intencional) */
+  /* Dorado — para precios y elementos "money" */
+  --gold: #C9A028;
+  --gold-strong: #A07818;
+  --gold-light: #F5E8C0;
+
+  /* Estado positivo — salvia */
   --sage: #4E7A54;
   --sage-light: #E6F1E7;
 
-  /* Estado negativo — raspberry */
-  --error: #BE1050;
-  --error-light: #FFDDE8;
+  /* Estado negativo */
+  --error: #B84444;
+  --error-light: #FDDEDE;
 
-  /* Bordes — rosa pastel */
-  --line: #F2C4D8;
-  --line-strong: #DCA0BC;
+  /* Bordes — rosa blush cálido */
+  --line: #EDD4C4;
+  --line-strong: #D4A898;
 
   /* Forma */
   --radius: 14px;
   --radius-sm: 8px;
   --radius-lg: 20px;
 
-  /* Sombras rosadas */
-  --shadow: 0 2px 12px rgba(224, 85, 133, 0.1);
-  --shadow-hover: 0 8px 28px rgba(224, 85, 133, 0.18);
+  /* Sombras */
+  --shadow: 0 2px 12px rgba(160, 80, 70, 0.10);
+  --shadow-hover: 0 8px 28px rgba(160, 80, 70, 0.18);
 }
 
 /* ————— Reset ————— */
@@ -109,7 +114,7 @@ main {
 
 .price {
   font-weight: 700;
-  color: var(--accent-strong);
+  color: var(--gold-strong);
   font-size: 1.05rem;
 }
 
@@ -123,7 +128,7 @@ main {
 }
 
 .promo-strip {
-  background: #8B1A4A;
+  background: #1C1410;
 }
 
 .promo-strip-track {
@@ -135,7 +140,7 @@ main {
   padding: 0.48rem 0;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #FFD0E8;
+  color: #F5DDD4;
 }
 
 .site-header-inner {
@@ -332,7 +337,7 @@ main {
   padding: 2rem 2rem 1.8rem;
   border: 1.5px solid var(--line);
   border-radius: var(--radius-lg);
-  background: linear-gradient(140deg, #ffffff 40%, #FFE0EE 100%);
+  background: linear-gradient(140deg, #ffffff 40%, #F5E0D4 100%);
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
@@ -345,7 +350,7 @@ main {
   right: -80px;
   width: 280px;
   height: 280px;
-  background: radial-gradient(circle, rgba(240, 180, 210, 0.35) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(210, 155, 130, 0.35) 0%, transparent 65%);
   pointer-events: none;
   border-radius: 50%;
 }
@@ -354,7 +359,7 @@ main {
   width: fit-content;
   background: var(--accent-light);
   color: var(--accent-strong);
-  border: 1px solid rgba(224, 85, 133, 0.3);
+  border: 1px solid rgba(170, 80, 70, 0.28);
   border-radius: 6px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -640,7 +645,7 @@ main {
 .button-primary:hover:not(:disabled) {
   background: var(--accent-strong);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(224, 85, 133, 0.4);
+  box-shadow: 0 4px 14px rgba(160, 80, 70, 0.38);
 }
 
 .button-ghost {
@@ -714,7 +719,7 @@ main {
 
 .input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(224, 85, 133, 0.12);
+  box-shadow: 0 0 0 3px rgba(160, 80, 70, 0.14);
 }
 
 .textarea {
@@ -821,7 +826,7 @@ main {
 .shop-footer {
   border-top: 1.5px solid var(--line);
   padding: 1.8rem 0 2.2rem;
-  background: #FFE0EE;
+  background: #F0E0D4;
 }
 
 .footer-grid {
@@ -837,7 +842,7 @@ main {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent-strong);
+  color: var(--gold-strong);
   font-weight: 700;
 }
 
@@ -869,12 +874,12 @@ main {
 .pill-category {
   background: var(--accent-light);
   color: var(--accent-strong);
-  border: 1px solid rgba(224, 85, 133, 0.3);
+  border: 1px solid rgba(170, 80, 70, 0.28);
 }
 .pill-collection {
-  background: #EEF0FF;
-  color: #4553B8;
-  border: 1px solid #C8CCEE;
+  background: var(--gold-light);
+  color: var(--gold-strong);
+  border: 1px solid #D4B868;
 }
 
 /* Fila de filtros de catálogo */
@@ -948,6 +953,163 @@ main {
   object-fit: cover;
 }
 
+/* ————— Theme Toggle ————— */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-color);
+  transition: color 0.15s, background 0.15s;
+  padding: 0;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.theme-toggle-btn.theme-active {
+  background: var(--accent-light);
+  color: var(--accent-strong);
+}
+
+/* ————— Dark mode ————— */
+[data-theme="dark"] {
+  --bg: #180E0A;
+  --surface: #2A1C16;
+  --surface-soft: #3A2820;
+  --surface-strong: #C87070;
+
+  --ink: #F5EAE2;
+  --muted-color: #C0A090;
+
+  --accent: #D48080;
+  --accent-strong: #E89898;
+  --accent-light: #3A2020;
+
+  --gold: #D4A830;
+  --gold-strong: #E0BE50;
+  --gold-light: #2A2010;
+
+  --sage: #6A9A70;
+  --sage-light: #1A2A1E;
+
+  --error: #D46060;
+  --error-light: #2A1010;
+
+  --line: #4A3028;
+  --line-strong: #6A4838;
+
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+/* Overrides para colores hardcodeados en dark mode */
+[data-theme="dark"] .promo-strip {
+  background: #0E0806;
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(140deg, #2A1C16 40%, #3A2820 100%);
+}
+
+[data-theme="dark"] .hero::after {
+  background: radial-gradient(circle, rgba(180, 100, 80, 0.2) 0%, transparent 65%);
+}
+
+[data-theme="dark"] .shop-footer {
+  background: #1C1410;
+}
+
+[data-theme="dark"] .nav-dropdown {
+  background: var(--surface);
+}
+
+/* En dark mode el marco necesita un fondo claro propio para que multiply
+   siga funcionando (blanco × imagen = imagen). Sin esto el gold se vuelve negro. */
+[data-theme="dark"] .ornate-frame-isolated {
+  background: #F5EAE2;
+}
+
+/* ————— Confirm Modal ————— */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(28, 20, 16, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+  animation: modal-fade 0.15s ease;
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 2rem 1.75rem 1.5rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(28, 20, 16, 0.22);
+  animation: modal-scale 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@keyframes modal-scale {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.modal-icon {
+  color: var(--accent-strong);
+  margin-bottom: 0.25rem;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.modal-description {
+  font-size: 0.9rem;
+  color: var(--muted-color);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
 /* ————— Responsive ————— */
 @media (max-width: 700px) {
   main {
@@ -983,7 +1145,7 @@ main {
     padding: 0.8rem 4%;
     gap: 0.45rem;
     z-index: 19;
-    box-shadow: 0 4px 12px rgba(224, 85, 133, 0.10);
+    box-shadow: 0 4px 12px rgba(160, 80, 70, 0.10);
   }
 
   .nav-links.nav-open {

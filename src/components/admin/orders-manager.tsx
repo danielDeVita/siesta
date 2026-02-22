@@ -92,6 +92,12 @@ export function AdminOrdersManager({ initialOrders }: { initialOrders: AdminOrde
           <button className="button button-ghost" onClick={() => router.push("/admin/products")}>
             Ver productos
           </button>
+          <button className="button button-ghost" onClick={() => router.push("/admin/categories")}>
+            Categorías
+          </button>
+          <button className="button button-ghost" onClick={() => router.push("/admin/collections")}>
+            Colecciones
+          </button>
           <button className="button button-ghost" onClick={() => router.push("/admin/reports")}>
             Reportes
           </button>

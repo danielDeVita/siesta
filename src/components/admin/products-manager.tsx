@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { formatArs } from "@/lib/money";
+import { ConfirmModal } from "@/components/confirm-modal";
 
 type ProductStatus = "ACTIVE" | "ARCHIVED";
 
@@ -90,6 +91,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [pending, setPending] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null);
   const router = useRouter();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -250,9 +252,6 @@ export function AdminProductsManager({ initialProducts, categories, collections 
   };
 
   const deleteProduct = async (id: string) => {
-    const confirmed = window.confirm("¿Eliminar producto?");
-    if (!confirmed) return;
-
     const response = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
     if (!response.ok) {
@@ -260,6 +259,23 @@ export function AdminProductsManager({ initialProducts, categories, collections 
       return;
     }
     setProducts((current) => current.filter((product) => product.id !== id));
+  };
+
+  const confirmDeleteProduct = (product: { id: string; title: string }) => {
+    setPending({
+      title: "Eliminar producto",
+      description: `¿Eliminar "${product.title}"? Se borrarán también sus imágenes. Esta acción no se puede deshacer.`,
+      onConfirm: () => { deleteProduct(product.id); setPending(null); },
+    });
+  };
+
+  const confirmRemoveImage = (index: number, url: string) => {
+    const name = url.split("/").pop()?.split("?")[0] ?? `imagen ${index + 1}`;
+    setPending({
+      title: "Quitar imagen",
+      description: `¿Quitar "${name}" del producto? Si guardás el formulario, la imagen se eliminará definitivamente.`,
+      onConfirm: () => { removeImage(index); setPending(null); },
+    });
   };
 
   const logout = async () => {
@@ -466,7 +482,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                       <button
                         type="button"
                         className="button button-ghost"
-                        onClick={() => removeImage(index)}
+                        onClick={() => confirmRemoveImage(index, form.images[index]?.url ?? "")}
                       >
                         Quitar imagen
                       </button>
@@ -540,7 +556,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                       <button className="button button-ghost" onClick={() => editProduct(product)}>
                         Editar
                       </button>
-                      <button className="button button-ghost" onClick={() => deleteProduct(product.id)}>
+                      <button className="button button-ghost" onClick={() => confirmDeleteProduct(product)}>
                         Eliminar
                       </button>
                     </div>
@@ -559,6 +575,14 @@ export function AdminProductsManager({ initialProducts, categories, collections 
           </table>
         </div>
       </section>
+
+      <ConfirmModal
+        open={pending !== null}
+        title={pending?.title ?? ""}
+        description={pending?.description ?? ""}
+        onConfirm={pending?.onConfirm ?? (() => {})}
+        onCancel={() => setPending(null)}
+      />
     </section>
   );
 }

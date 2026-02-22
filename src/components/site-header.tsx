@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { useCart } from "@/components/cart-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type NavItem = { id: string; name: string };
 
@@ -12,12 +12,8 @@ type SiteHeaderProps = {
   collections: NavItem[];
 };
 
-function linkClass(pathname: string, href: string) {
-  return pathname === href ? "nav-link-active" : undefined;
-}
 
 export function SiteHeader({ categories, collections }: SiteHeaderProps) {
-  const pathname = usePathname();
   const { totalItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -101,7 +97,7 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
               className={`nav-item${catalogOpen ? " nav-item-open" : ""}`}
             >
               <button
-                className={`nav-catalog-btn${pathname === "/" ? " nav-link-active" : ""}`}
+                className="nav-catalog-btn"
                 onClick={() => setCatalogOpen((v) => !v)}
                 aria-expanded={catalogOpen}
                 aria-haspopup="true"
@@ -112,7 +108,7 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
                   <rect x="3" y="14" width="7" height="7" />
                   <rect x="14" y="14" width="7" height="7" />
                 </svg>
-                Catálogo
+                Menú
                 <svg className="nav-catalog-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
@@ -158,18 +154,18 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
               </div>
             </div>
           ) : (
-            <Link href="/" className={linkClass(pathname, "/")} onClick={closeAll}>
+            <Link href="/" onClick={closeAll}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
                 <rect x="14" y="14" width="7" height="7" />
               </svg>
-              Catálogo
+              Menú
             </Link>
           )}
 
-          <Link href="/cart" className={linkClass(pathname, "/cart")} onClick={closeAll}>
+          <Link href="/cart" onClick={closeAll}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
@@ -178,9 +174,11 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
             Carrito{totalItems > 0 ? ` (${totalItems})` : ""}
           </Link>
 
-          <Link href="/admin/login" className={pathname.startsWith("/admin") ? "nav-link-active" : undefined} onClick={closeAll}>
+          <Link href="/admin/login" onClick={closeAll}>
             Admin
           </Link>
+
+          <ThemeToggle />
         </nav>
       </div>
     </header>
