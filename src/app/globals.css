@@ -989,11 +989,12 @@ main {
 }
 
 /* ————— Cart image link ————— */
-.nav-cart-img-link {
+.nav-cart-img-link,
+.nav-icon-link {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem;
+  padding: 0.38rem 0.85rem;
   line-height: 0;
 }
 
@@ -1002,6 +1003,18 @@ main {
   height: 36px;
   object-fit: contain;
   border-radius: 4px;
+}
+
+[data-theme="dark"] .nav-cart-img,
+[data-theme="dark"] .nav-menu-img,
+[data-theme="dark"] .theme-toggle-icon {
+  filter: invert(1);
+}
+
+.nav-menu-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .nav-cart-badge {
