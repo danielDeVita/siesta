@@ -21,7 +21,13 @@ const displayFont = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Siesta | Bolsas estampadas",
-  description: "E-commerce de bolsos estampados con diseño original."
+  description: "Bolsas estampadas con diseño original.",
+  openGraph: {
+    title: "Siesta | Bolsas estampadas",
+    description: "Bolsas estampadas con diseño original.",
+    images: [{ url: "https://res.cloudinary.com/dy10rxkdv/image/upload/v1771701443/siesta/products/ogxf0xkfpcmxhwecxieg.jpg" }],
+    type: "website"
+  }
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

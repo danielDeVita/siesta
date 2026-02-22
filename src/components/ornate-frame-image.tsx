@@ -1,5 +1,5 @@
 import Image from "next/image";
-import frameImg from "../../assets_siesta/frame.jpeg";
+import frameImg from "@/assets/frame.jpeg";
 
 /**
  * Marco barroco usando frame.jpeg (1200×1200) como overlay.

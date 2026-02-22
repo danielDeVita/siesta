@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import chartImg from "@/assets/chart.png";
 
 type NavItem = { id: string; name: string };
 
@@ -165,13 +167,9 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
             </Link>
           )}
 
-          <Link href="/cart" onClick={closeAll}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19.4a2 2 0 001.98-1.71L23 6H6" />
-            </svg>
-            Carrito{totalItems > 0 ? ` (${totalItems})` : ""}
+          <Link href="/cart" onClick={closeAll} className="nav-cart-img-link">
+            <Image src={chartImg} alt="Carrito" className="nav-cart-img" width={36} height={36} />
+            {totalItems > 0 && <span className="nav-cart-badge">{totalItems}</span>}
           </Link>
 
           <Link href="/admin/login" onClick={closeAll}>
