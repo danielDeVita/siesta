@@ -1007,7 +1007,8 @@ main {
 
 [data-theme="dark"] .nav-cart-img,
 [data-theme="dark"] .nav-menu-img,
-[data-theme="dark"] .theme-toggle-icon {
+[data-theme="dark"] .theme-toggle-icon,
+[data-theme="dark"] .footer-icon {
   filter: invert(1);
 }
 

@@ -1,16 +1,17 @@
+import Image from "next/image";
+import emailImg from "@/assets/email.png";
+import phoneImg from "@/assets/phone.png";
+import paintingImg from "@/assets/painting.png";
+
 export function SiteFooter() {
   return (
     <footer className="shop-footer">
       <div className="container footer-grid">
         <div>
-          <strong>Siesta</strong>
-          <p>Diseños originales, producción pequeña y retiro coordinado.</p>
-        </div>
-        <div>
           <strong>Contacto</strong>
-          <p>Email: hola@siesta.com</p>
-          <p>WhatsApp: +54 9 11 0000-0000</p>
-          <p>Instagram: @siesta.bolsas</p>
+          <p><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> hola@siesta.com</p>
+          <p><Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> +54 9 11 0000-0000</p>
+          <p><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> @siesta.bolsas</p>
         </div>
         <div>
           <strong>Políticas</strong>
