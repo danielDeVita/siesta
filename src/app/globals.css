@@ -355,19 +355,6 @@ main {
   border-radius: 50%;
 }
 
-.hero-kicker {
-  width: fit-content;
-  background: var(--accent-light);
-  color: var(--accent-strong);
-  border: 1px solid rgba(170, 80, 70, 0.28);
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.26rem 0.68rem;
-}
-
 .hero-title {
   margin: 0;
   font-family: var(--font-display), serif;
@@ -375,6 +362,15 @@ main {
   line-height: 1.1;
   font-weight: 700;
   color: var(--ink);
+}
+
+.hero-script {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
 }
 
 .hero-copy {

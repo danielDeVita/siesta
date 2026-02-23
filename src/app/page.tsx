@@ -19,7 +19,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
   return (
     <section className="stack home-stack">
       <header className="hero">
-        <div className="hero-kicker">Colección Siesta</div>
+        <p className="hero-script">diseños con identidad propia</p>
         <h1 className="hero-title">Bolsas estampadas hechas para usar todos los días</h1>
         <p className="hero-copy">
           Diseños únicos en series pequeñas. Elegí tu bolsa, pagá online y coordinamos el retiro por WhatsApp.
