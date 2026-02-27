@@ -8,10 +8,13 @@ export function SiteFooter() {
     <footer className="shop-footer">
       <div className="container footer-grid">
         <div>
+          <div className="footer-brand">
+            <p className="footer-brand-name">Sine</p>
+          </div>
           <strong>Contacto</strong>
-          <p><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> hola@siesta.com</p>
+          <p><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> hola@sine.com</p>
           <p><Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> +54 9 11 0000-0000</p>
-          <p><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> @siesta.bolsas</p>
+          <p><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> @sine.bolsas</p>
         </div>
         <div>
           <strong>Políticas</strong>

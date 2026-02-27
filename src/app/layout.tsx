@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, Marcellus, Playfair_Display, Rochester } from "next/font/google";
 import "@/app/globals.css";
 import { CartProvider } from "@/components/cart-provider";
 import { SiteHeader } from "@/components/site-header";
@@ -19,11 +19,23 @@ const displayFont = Playfair_Display({
   style: ["normal", "italic"]
 });
 
+const secondaryFont = Marcellus({
+  variable: "--font-secondary",
+  subsets: ["latin"],
+  weight: ["400"]
+});
+
+const scriptFont = Rochester({
+  variable: "--font-script",
+  subsets: ["latin"],
+  weight: ["400"]
+});
+
 export const metadata: Metadata = {
-  title: "Siesta | Bolsas estampadas",
+  title: "Sine | Bolsas estampadas",
   description: "Bolsas estampadas con diseño original.",
   openGraph: {
-    title: "Siesta | Bolsas estampadas",
+    title: "Sine | Bolsas estampadas",
     description: "Bolsas estampadas con diseño original.",
     images: [{ url: "https://res.cloudinary.com/dy10rxkdv/image/upload/v1771701443/siesta/products/ogxf0xkfpcmxhwecxieg.jpg" }],
     type: "website"
@@ -43,7 +55,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${bodyFont.variable} ${displayFont.variable}`}>
+      <body className={`${bodyFont.variable} ${displayFont.variable} ${secondaryFont.variable} ${scriptFont.variable}`}>
         <CartProvider>
           <div className="main-layout">
             <SiteHeader categories={categories} collections={collections} />

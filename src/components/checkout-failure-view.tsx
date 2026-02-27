@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
 export function CheckoutFailureView() {
@@ -11,6 +12,7 @@ export function CheckoutFailureView() {
     <section className="stack">
       <div className="card">
         <div className="card-body stack">
+          <Image src="/logo.jpeg" alt="Logo Sine" width={72} height={72} className="checkout-logo" />
           <h1 style={{ margin: 0 }}>No se pudo completar el pago</h1>
           <p className="muted">
             Podés intentar nuevamente desde el carrito. Si el problema continúa, escribinos por WhatsApp.

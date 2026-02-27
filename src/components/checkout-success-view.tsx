@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
@@ -41,9 +42,10 @@ export function CheckoutSuccessView() {
     <section className="stack">
       <div className="card">
         <div className="card-body stack">
+          <Image src="/logo.jpeg" alt="Logo Sine" width={72} height={72} className="checkout-logo" />
           <h1 style={{ margin: 0 }}>Pago recibido</h1>
           <p className="muted">
-            Gracias por comprar en Siesta. Te vamos a escribir por WhatsApp para coordinar el retiro.
+            Gracias por comprar en Sine. Te vamos a escribir por WhatsApp para coordinar el retiro.
           </p>
           {order && (
             <>

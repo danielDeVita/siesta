@@ -70,9 +70,11 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
   return (
     <header className="site-header">
       <div className="container site-header-inner">
-        <Link href="/" className="brand" aria-label="Siesta inicio">
-          <span className="brand-title">siesta</span>
-          <span className="brand-subtitle">bolsas estampadas</span>
+        <Link href="/" className="brand" aria-label="Sine inicio">
+          <span className="brand-copy">
+            <span className="brand-title">Sine</span>
+            <span className="brand-subtitle">bolsas estampadas</span>
+          </span>
         </Link>
 
         <button
