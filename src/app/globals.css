@@ -466,7 +466,7 @@ main {
 
 .home-section-head h2 {
   font-family: var(--font-body), sans-serif;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 /* ————— Product Grid & Cards ————— */
@@ -685,6 +685,10 @@ main {
   align-items: center;
   gap: 0.7rem;
   flex-wrap: wrap;
+}
+
+.catalog-toolbar .button {
+  font-weight: 400;
 }
 
 /* ————— Forms ————— */
