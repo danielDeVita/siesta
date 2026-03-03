@@ -465,8 +465,8 @@ main {
 }
 
 .home-section-head h2 {
-  font-family: var(--font-secondary), serif;
-  font-weight: 400;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 600;
 }
 
 /* ————— Product Grid & Cards ————— */
