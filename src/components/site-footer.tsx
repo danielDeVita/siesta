@@ -7,16 +7,15 @@ export function SiteFooter() {
   return (
     <footer className="shop-footer">
       <div className="container footer-grid">
-        <div>
-          <div className="footer-brand">
-            <p className="footer-brand-name">Sine</p>
-          </div>
+        <div className="footer-col footer-col-contact">
           <strong>Contacto</strong>
-          <p><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> hola@sine.com</p>
-          <p><Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> +54 9 11 0000-0000</p>
-          <p><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" style={{ display: "inline", verticalAlign: "middle" }} /> @sine.bolsas</p>
+          <div className="footer-contact-row">
+            <p className="footer-contact-item"><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" /> hola@sine.com</p>
+            <p className="footer-contact-item"><Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" /> +54 9 11 0000-0000</p>
+            <p className="footer-contact-item"><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" /> @sine.bolsas</p>
+          </div>
         </div>
-        <div>
+        <div className="footer-col footer-col-policies">
           <strong>Políticas</strong>
           <p>Solo retiro. Te contactamos por WhatsApp cuando esté listo.</p>
           <p>Horarios de retiro: lun a vie, 15:00 a 19:00.</p>
