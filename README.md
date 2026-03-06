@@ -7,6 +7,23 @@ E-commerce fullstack para Siesta construido con:
 - Mercado Pago Checkout Pro (redirect)
 - Admin con sesión por cookie firmada
 
+## Codex
+
+Este repo usa solo superficies oficiales de Codex:
+
+- `AGENTS.md` en la raíz del repo para instrucciones específicas del proyecto
+- `README.md` para documentación humana normal
+- `~/.codex/config.toml` para configuración global y MCP
+- `~/.codex/skills/` para skills oficiales de Codex
+
+Notas:
+
+- No existe una estructura repo-local oficial de Codex equivalente a `.claude/`.
+- No se deben crear carpetas locales como `.codex/commands`, `.codex/tools`, `.codex/settings` o `.codex/mcp`.
+- Si se necesitan scripts del proyecto, deben quedar en `scripts/` como scripts normales del repo.
+- Si se necesita Playwright u otro MCP, debe configurarse en `~/.codex/config.toml`, no dentro de este repo.
+- `.claude/settings.local.json` puede coexistir, pero no forma parte de la configuración oficial de Codex.
+
 ## Requisitos
 
 - Node.js 20+
