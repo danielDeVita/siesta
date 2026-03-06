@@ -287,7 +287,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
   return (
     <section className="admin-shell">
       <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1 style={{ margin: 0 }}>Admin Productos</h1>
+        <h1 className="admin-login-title">Admin Productos</h1>
         <div className="row">
           <button className="button button-ghost" onClick={() => router.push("/admin/categories")}>
             Categorías

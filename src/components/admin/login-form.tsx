@@ -38,7 +38,7 @@ export function AdminLoginForm() {
   return (
     <form onSubmit={handleSubmit} className="card">
       <div className="card-body stack">
-        <h1 style={{ margin: 0 }}>Admin Login</h1>
+        <h1 className="admin-login-title">Admin Login</h1>
         <div className="field">
           <label htmlFor="adminEmail" className="label">
             Email

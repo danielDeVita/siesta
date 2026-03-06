@@ -24,33 +24,6 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
   const catalogRef = useRef<HTMLDivElement>(null);
   const hasCatalogMenu = categories.length > 0 || collections.length > 0;
 
-  // Tab title visibility effect
-  useEffect(() => {
-    const originalTitle = document.title;
-    let timer: ReturnType<typeof setInterval>;
-
-    function handleVisibilityChange() {
-      if (document.hidden) {
-        let show = true;
-        document.title = "Cholchito";
-        timer = setInterval(() => {
-          document.title = show ? "Te Amo" : "Cholchito";
-          show = !show;
-        }, 1000);
-      } else {
-        clearInterval(timer);
-        document.title = originalTitle;
-      }
-    }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearInterval(timer);
-      document.title = originalTitle;
-    };
-  }, []);
-
   // Close catalog dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

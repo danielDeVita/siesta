@@ -1,7 +1,7 @@
 /* ================================================================
    SIESTA — Glam Design System
    Paleta: Provincial Pink × Beauty Bush × Gold × Near-Black
-   Tipografía: Playfair Display (display) + Marcellus (secondary)
+   Tipografía: Marcellus (secondary/editorial)
    + DM Sans (body) + Rochester (script accent)
    ================================================================ */
 
@@ -69,7 +69,7 @@ body {
 }
 
 h1 {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-secondary), serif;
 }
 
 h2, h3 {
@@ -180,8 +180,8 @@ main {
 }
 
 .nav-links a:hover {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+  border-color: transparent;
+  color: var(--accent);
   background: var(--accent-light);
 }
 
@@ -223,8 +223,8 @@ main {
 }
 .nav-catalog-btn:hover,
 .nav-item-open .nav-catalog-btn {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+  border-color: transparent;
+  color: var(--accent);
   background: var(--accent-light);
 }
 .nav-catalog-chevron {
@@ -274,6 +274,7 @@ main {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  font-family: var(--font-secondary), serif;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -302,6 +303,7 @@ main {
   display: inline-block;
   padding: 0.22rem 0.65rem;
   border-radius: 20px;
+  font-family: var(--font-secondary), serif;
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--ink);
@@ -323,22 +325,14 @@ main {
   padding: 2rem 2rem 1.8rem;
   border: 1.5px solid var(--line);
   border-radius: var(--radius-lg);
-  background: linear-gradient(140deg, #ffffff 40%, #F5E0D4 100%);
+  background: linear-gradient(140deg, #F5E0D4 0%, #FFFFFF 50%, #F5E0D4 100%);
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
 }
 
 .hero::after {
-  content: '';
-  position: absolute;
-  top: -80px;
-  right: -80px;
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(210, 155, 130, 0.35) 0%, transparent 65%);
-  pointer-events: none;
-  border-radius: 50%;
+  content: none;
 }
 
 .home-logo {
@@ -358,6 +352,8 @@ main {
   justify-self: center;
   text-align: center;
   color: var(--muted-color);
+  font-family: var(--font-secondary), serif;
+  font-weight: 400;
   font-size: clamp(0.95rem, 1.8vw, 1.05rem);
   line-height: 1.7;
 }
@@ -464,8 +460,15 @@ main {
   flex-wrap: wrap;
 }
 
-.home-section-head h2 {
-  font-family: var(--font-body), sans-serif;
+.home-section-head h2,
+.admin-login-title {
+  margin: 0;
+  font-family: var(--font-secondary), serif;
+  font-weight: 400;
+}
+
+.catalog-toolbar .button {
+  font-family: var(--font-secondary), serif;
   font-weight: 400;
 }
 
@@ -528,8 +531,9 @@ main {
 }
 
 .product-card-link {
+  font-family: var(--font-secondary), serif;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 400;
   border: 1.5px solid var(--line);
   border-radius: 7px;
   background: var(--bg);
@@ -687,7 +691,10 @@ main {
   flex-wrap: wrap;
 }
 
-.catalog-toolbar .button {
+.catalog-toolbar strong,
+.product-card-body .muted,
+.product-card-foot .pill {
+  font-family: var(--font-secondary), serif;
   font-weight: 400;
 }
 
@@ -1095,11 +1102,7 @@ main {
 }
 
 [data-theme="dark"] .hero {
-  background: linear-gradient(140deg, #2A1C16 40%, #3A2820 100%);
-}
-
-[data-theme="dark"] .hero::after {
-  background: radial-gradient(circle, rgba(180, 100, 80, 0.2) 0%, transparent 65%);
+  background: linear-gradient(140deg, #3A2820 0%, #2A1C16 50%, #3A2820 100%);
 }
 
 [data-theme="dark"] .shop-footer {

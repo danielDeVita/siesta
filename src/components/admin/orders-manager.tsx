@@ -87,7 +87,7 @@ export function AdminOrdersManager({ initialOrders }: { initialOrders: AdminOrde
   return (
     <section className="admin-shell">
       <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1 style={{ margin: 0 }}>Admin Pedidos</h1>
+        <h1 className="admin-login-title">Admin Pedidos</h1>
         <div className="row">
           <button className="button button-ghost" onClick={() => router.push("/admin/products")}>
             Ver productos

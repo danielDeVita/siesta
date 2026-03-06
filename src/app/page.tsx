@@ -20,7 +20,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
     <section className="stack home-stack">
       <header className="hero">
         <h1 className="home-logo">Sine</h1>
-        <p className="home-manifesto">Salón del Imaginario Nostálgico y Estético</p>
+        <p className="home-manifesto">Salón del imaginario nostálgico y estético</p>
       </header>
 
       {data.length === 0 ? (
