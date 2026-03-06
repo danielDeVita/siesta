@@ -1,4 +1,3 @@
-import Image from "next/image";
 import frameImg from "@/assets/frame.jpeg";
 
 /**
@@ -11,10 +10,10 @@ export function OrnateFrameImage({ children }: { children: React.ReactNode }) {
     <div className="ornate-frame ornate-frame-isolated">
       <div className="ornate-frame-clip">{children}</div>
       <div className="ornate-frame-img-wrap">
-        <Image
-          src={frameImg}
+        <img
+          src={frameImg.src}
           alt=""
-          fill
+          aria-hidden="true"
           className="ornate-frame-img"
         />
       </div>
