@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 import { adminProductUpsertSchema } from "@/lib/validators";
 import { jsonError } from "@/lib/api";
+import { prepareNormalizedProductAttributes, serializeAdminProduct } from "@/lib/admin-products";
+import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
 
 async function buildUniqueSlugFromTitle(title: string): Promise<string> {
   const baseSlug = slugify(title) || "producto";
@@ -31,13 +33,26 @@ export async function GET() {
     return response;
   }
 
+  await backfillLegacyMeasurements(prisma);
+
   const products = await prisma.product.findMany({
-    include: { images: true },
+    include: {
+      images: true,
+      collection: true,
+      category: {
+        include: {
+          fieldDefinitions: {
+            orderBy: { sortOrder: "asc" }
+          }
+        }
+      },
+      fieldValues: true
+    },
     orderBy: { createdAt: "desc" }
   });
 
   return NextResponse.json({
-    products
+    products: products.map(serializeAdminProduct)
   });
 }
 
@@ -57,36 +72,71 @@ export async function POST(request: NextRequest) {
   const input = parsed.data;
   const title = input.title.trim();
   const slug = await buildUniqueSlugFromTitle(title);
+  let normalizedAttributes;
 
   try {
-    const product = await prisma.product.create({
-      data: {
-        title,
-        slug,
-        description: input.description?.trim() || null,
-        measurements: input.measurements?.trim() || null,
-        priceArs: input.priceArs,
-        stock: input.stock,
-        status: input.status,
-        categoryId: input.categoryId ?? null,
-        collectionId: input.collectionId ?? null,
-        createdByAdminId: session.id,
-        images: {
-          createMany: {
-            data: input.images.map((image, index) => ({
-              url: image.url,
-              altText: image.altText || null,
-              sortOrder: image.sortOrder ?? index
-            }))
+    normalizedAttributes = await prepareNormalizedProductAttributes(input.categoryId ?? null, input.attributes);
+  } catch (error) {
+    return jsonError(error instanceof Error ? error.message : "No se pudieron validar los atributos.", 400);
+  }
+
+  try {
+    const product = await prisma.$transaction(async (tx) => {
+      const created = await tx.product.create({
+        data: {
+          title,
+          slug,
+          description: input.description?.trim() || null,
+          priceArs: input.priceArs,
+          stock: input.stock,
+          status: input.status,
+          categoryId: input.categoryId ?? null,
+          collectionId: input.collectionId ?? null,
+          createdByAdminId: session.id,
+          images: {
+            createMany: {
+              data: input.images.map((image, index) => ({
+                url: image.url,
+                altText: image.altText || null,
+                sortOrder: image.sortOrder ?? index
+              }))
+            }
           }
         }
-      },
-      include: {
-        images: true
+      });
+
+      for (const attribute of normalizedAttributes) {
+        if (attribute.value === null || (typeof attribute.value === "string" && attribute.value.trim().length === 0)) {
+          continue;
+        }
+
+        await tx.productFieldValue.create({
+          data: {
+            productId: created.id,
+            categoryFieldDefinitionId: attribute.fieldDefinitionId,
+            valueJson: attribute.value
+          }
+        });
       }
+
+      return tx.product.findUniqueOrThrow({
+        where: { id: created.id },
+        include: {
+          images: true,
+          collection: true,
+          category: {
+            include: {
+              fieldDefinitions: {
+                orderBy: { sortOrder: "asc" }
+              }
+            }
+          },
+          fieldValues: true
+        }
+      });
     });
 
-    return NextResponse.json({ product }, { status: 201 });
+    return NextResponse.json({ product: serializeAdminProduct(product) }, { status: 201 });
   } catch (error) {
     console.error(error);
     return jsonError("No se pudo crear el producto.", 409);

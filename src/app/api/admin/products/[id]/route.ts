@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 import { adminProductUpsertSchema } from "@/lib/validators";
 import { jsonError } from "@/lib/api";
+import { prepareNormalizedProductAttributes, serializeAdminProduct, syncProductFieldValues } from "@/lib/admin-products";
 
 type Params = {
   params: {
@@ -52,6 +53,25 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const input = parsed.data;
   const title = input.title.trim();
   const slug = await buildUniqueSlugFromTitle(title, params.id);
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: params.id },
+    select: {
+      id: true,
+      categoryId: true
+    }
+  });
+
+  if (!existingProduct) {
+    return jsonError("Producto no encontrado.", 404);
+  }
+
+  let normalizedAttributes;
+
+  try {
+    normalizedAttributes = await prepareNormalizedProductAttributes(input.categoryId ?? null, input.attributes);
+  } catch (error) {
+    return jsonError(error instanceof Error ? error.message : "No se pudieron validar los atributos.", 400);
+  }
 
   try {
     const product = await prisma.$transaction(async (tx) => {
@@ -59,13 +79,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         where: { productId: params.id }
       });
 
-      return tx.product.update({
+      const updatedProduct = await tx.product.update({
         where: { id: params.id },
         data: {
           title,
           slug,
           description: input.description?.trim() || null,
-          measurements: input.measurements?.trim() || null,
           priceArs: input.priceArs,
           stock: input.stock,
           status: input.status,
@@ -81,11 +100,45 @@ export async function PATCH(request: NextRequest, { params }: Params) {
             }
           }
         },
-        include: { images: true }
+        include: {
+          images: true,
+          collection: true,
+          category: {
+            include: {
+              fieldDefinitions: {
+                orderBy: { sortOrder: "asc" }
+              }
+            }
+          },
+          fieldValues: true
+        }
+      });
+
+      await syncProductFieldValues(tx, {
+        productId: updatedProduct.id,
+        previousCategoryId: existingProduct.categoryId,
+        nextCategoryId: input.categoryId ?? null,
+        normalizedAttributes
+      });
+
+      return tx.product.findUniqueOrThrow({
+        where: { id: updatedProduct.id },
+        include: {
+          images: true,
+          collection: true,
+          category: {
+            include: {
+              fieldDefinitions: {
+                orderBy: { sortOrder: "asc" }
+              }
+            }
+          },
+          fieldValues: true
+        }
       });
     });
 
-    return NextResponse.json({ product });
+    return NextResponse.json({ product: serializeAdminProduct(product) });
   } catch (error) {
     console.error(error);
     return jsonError("No se pudo actualizar el producto.", 409);

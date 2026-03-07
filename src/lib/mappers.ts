@@ -1,21 +1,30 @@
-import type { Product, ProductImage, Category, Collection } from "@prisma/client";
+import type {
+  Product,
+  ProductImage,
+  Category,
+  Collection,
+  CategoryFieldDefinition,
+  ProductFieldValue
+} from "@prisma/client";
 import type { ProductDTO, ProductDetailDTO } from "@/types";
+import { buildProductAttributes } from "@/lib/product-attributes";
 
 type ProductWithImages = Product & {
   images: ProductImage[];
-  category: Category | null;
+  category: (Category & { fieldDefinitions: CategoryFieldDefinition[] }) | null;
   collection: Collection | null;
+  fieldValues: ProductFieldValue[];
 };
 
 export function toProductDTO(product: ProductWithImages): ProductDTO {
   const coverImage = [...product.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
+  const attributes = buildProductAttributes(product.category?.fieldDefinitions ?? [], product.fieldValues, product.measurements);
 
   return {
     id: product.id,
     slug: product.slug,
     title: product.title,
     description: product.description,
-    measurements: product.measurements,
     priceArs: product.priceArs,
     stock: product.stock,
     status: product.status,
@@ -23,7 +32,8 @@ export function toProductDTO(product: ProductWithImages): ProductDTO {
     categoryId: product.categoryId,
     categoryName: product.category?.name ?? null,
     collectionId: product.collectionId,
-    collectionName: product.collection?.name ?? null
+    collectionName: product.collection?.name ?? null,
+    attributes
   };
 }
 

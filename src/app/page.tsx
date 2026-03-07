@@ -1,14 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import { toProductDTO } from "@/lib/mappers";
 import { CatalogGrid } from "@/components/catalog-grid";
+import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
 export const dynamic = "force-dynamic";
 
 type SearchParams = { cat?: string; col?: string };
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {
+  await backfillLegacyMeasurements(prisma);
+
   const products = await prisma.product.findMany({
     where: { status: "ACTIVE" },
-    include: { images: true, category: true, collection: true },
+    include: {
+      images: true,
+      category: {
+        include: {
+          fieldDefinitions: {
+            orderBy: { sortOrder: "asc" }
+          }
+        }
+      },
+      collection: true,
+      fieldValues: true
+    },
     orderBy: { createdAt: "desc" }
   });
 

@@ -1,11 +1,37 @@
-import type { OrderStatus, ProductStatus } from "@prisma/client";
+import type { CategoryFieldType, OrderStatus, ProductStatus } from "@prisma/client";
+
+export type CategoryFieldDefinitionDTO = {
+  id: string;
+  key: string;
+  label: string;
+  type: CategoryFieldType;
+  required: boolean;
+  unit: string | null;
+  options: string[];
+  showInCatalog: boolean;
+  showInDetail: boolean;
+  sortOrder: number;
+  isActive: boolean;
+};
+
+export type ProductAttributeDTO = {
+  fieldDefinitionId: string;
+  key: string;
+  label: string;
+  type: CategoryFieldType;
+  unit: string | null;
+  rawValue: string | number | boolean | null;
+  displayValue: string;
+  showInCatalog: boolean;
+  showInDetail: boolean;
+  sortOrder: number;
+};
 
 export type ProductDTO = {
   id: string;
   slug: string;
   title: string;
   description: string | null;
-  measurements: string | null;
   priceArs: number;
   stock: number;
   status: ProductStatus;
@@ -14,6 +40,7 @@ export type ProductDTO = {
   categoryName: string | null;
   collectionId: string | null;
   collectionName: string | null;
+  attributes: ProductAttributeDTO[];
 };
 
 export type ProductImageDTO = {
@@ -73,12 +100,37 @@ export type AdminProductImageInput = {
   sortOrder?: number;
 };
 
+export type AdminProductAttributeInput = {
+  fieldDefinitionId: string;
+  value: string | number | boolean | null;
+};
+
 export type AdminProductUpsertInput = {
   title: string;
   description?: string;
-  measurements?: string;
   priceArs: number;
   stock: number;
   status: ProductStatus;
   images: AdminProductImageInput[];
+  categoryId?: string | null;
+  collectionId?: string | null;
+  attributes: AdminProductAttributeInput[];
+};
+
+export type AdminCategoryFieldDefinitionInput = {
+  id?: string;
+  label: string;
+  type: CategoryFieldType;
+  required?: boolean;
+  unit?: string;
+  options?: string[];
+  showInCatalog?: boolean;
+  showInDetail?: boolean;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+
+export type AdminCategoryUpsertInput = {
+  name: string;
+  fieldDefinitions: AdminCategoryFieldDefinitionInput[];
 };

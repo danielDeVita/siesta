@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { formatArs } from "@/lib/money";
 import { ConfirmModal } from "@/components/confirm-modal";
+import type { ProductAttributeDTO, CategoryFieldDefinitionDTO } from "@/types";
 
 type ProductStatus = "ACTIVE" | "ARCHIVED";
 
@@ -25,9 +26,16 @@ type AdminProduct = {
     altText: string | null;
     sortOrder: number;
   }>;
+  attributes: ProductAttributeDTO[];
+  catalogAttributesSummary: string;
 };
 
-type CategoryOption = { id: string; name: string };
+type CategoryOption = {
+  id: string;
+  name: string;
+  fieldDefinitions: CategoryFieldDefinitionDTO[];
+};
+
 type CollectionOption = { id: string; name: string };
 
 type Props = {
@@ -51,31 +59,42 @@ type FormImage = {
   altText: string;
 };
 
+type AttributeInputState = {
+  fieldDefinitionId: string;
+  key: string;
+  label: string;
+  type: CategoryFieldDefinitionDTO["type"];
+  required: boolean;
+  unit: string | null;
+  options: string[];
+  value: string | boolean | null;
+  showInCatalog: boolean;
+  showInDetail: boolean;
+};
+
 type FormState = {
   id?: string;
   title: string;
   description: string;
-  measurementsLargo: string;
-  measurementsAlto: string;
   priceArs: string;
   stock: string;
   status: ProductStatus;
   categoryId: string;
   collectionId: string;
   images: FormImage[];
+  attributes: AttributeInputState[];
 };
 
 const EMPTY_FORM: FormState = {
   title: "",
   description: "",
-  measurementsLargo: "",
-  measurementsAlto: "",
   priceArs: "",
   stock: "",
   status: "ACTIVE",
   categoryId: "",
   collectionId: "",
-  images: []
+  images: [],
+  attributes: []
 };
 
 function filenameToAltText(filename: string): string {
@@ -83,6 +102,94 @@ function filenameToAltText(filename: string): string {
     .replace(/\.[^/.]+$/, "")
     .replace(/[-_]+/g, " ")
     .trim();
+}
+
+function getActiveDefinitions(category: CategoryOption | undefined) {
+  return (category?.fieldDefinitions ?? []).filter((definition) => definition.isActive);
+}
+
+function buildAttributeState(
+  definitions: CategoryFieldDefinitionDTO[],
+  currentAttributes: ProductAttributeDTO[] = []
+): AttributeInputState[] {
+  const currentByKey = new Map(currentAttributes.map((attribute) => [attribute.key, attribute]));
+
+  return definitions.map((definition) => {
+    const current = currentByKey.get(definition.key);
+
+    return {
+      fieldDefinitionId: definition.id,
+      key: definition.key,
+      label: definition.label,
+      type: definition.type,
+      required: definition.required,
+      unit: definition.unit,
+      options: definition.options,
+      value:
+        current?.rawValue === null || current?.rawValue === undefined
+          ? definition.type === "BOOLEAN"
+            ? null
+            : ""
+          : typeof current.rawValue === "boolean"
+            ? current.rawValue
+            : String(current.rawValue),
+      showInCatalog: definition.showInCatalog,
+      showInDetail: definition.showInDetail
+    };
+  });
+}
+
+function categoryProductForm(product: AdminProduct, categories: CategoryOption[]): FormState {
+  const category = categories.find((item) => item.id === product.categoryId);
+  return {
+    id: product.id,
+    title: product.title,
+    description: product.description ?? "",
+    priceArs: String(product.priceArs / 100),
+    stock: String(product.stock),
+    status: product.status,
+    categoryId: product.categoryId ?? "",
+    collectionId: product.collectionId ?? "",
+    images: product.images
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((image) => ({
+        url: image.url,
+        altText: image.altText ?? ""
+      })),
+    attributes: buildAttributeState(getActiveDefinitions(category), product.attributes)
+  };
+}
+
+function remapAttributes(
+  currentAttributes: AttributeInputState[],
+  previousCategory: CategoryOption | undefined,
+  nextCategory: CategoryOption | undefined
+) {
+  const previousDefinitions = getActiveDefinitions(previousCategory);
+  const currentValuesByKey = new Map(
+    currentAttributes.map((attribute) => [attribute.key, attribute.value])
+  );
+
+  return getActiveDefinitions(nextCategory).map((definition) => {
+    const previousDefinition = previousDefinitions.find(
+      (item) => item.key === definition.key && item.type === definition.type
+    );
+    const preservedValue = previousDefinition ? currentValuesByKey.get(previousDefinition.key) : undefined;
+
+    return {
+      fieldDefinitionId: definition.id,
+      key: definition.key,
+      label: definition.label,
+      type: definition.type,
+      required: definition.required,
+      unit: definition.unit,
+      options: definition.options,
+      value: preservedValue ?? (definition.type === "BOOLEAN" ? null : ""),
+      showInCatalog: definition.showInCatalog,
+      showInDetail: definition.showInDetail
+    };
+  });
 }
 
 export function AdminProductsManager({ initialProducts, categories, collections }: Props) {
@@ -93,9 +200,13 @@ export function AdminProductsManager({ initialProducts, categories, collections 
   const [uploadingImages, setUploadingImages] = useState(false);
   const [pending, setPending] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null);
   const router = useRouter();
-
   const formRef = useRef<HTMLFormElement>(null);
+
   const editing = useMemo(() => Boolean(form.id), [form.id]);
+  const selectedCategory = useMemo(
+    () => categories.find((category) => category.id === form.categoryId),
+    [categories, form.categoryId]
+  );
   const canSubmit = useMemo(
     () =>
       !loading &&
@@ -158,6 +269,51 @@ export function AdminProductsManager({ initialProducts, categories, collections 
     }
   };
 
+  const updateAttributeValue = (fieldDefinitionId: string, value: string | boolean | null) => {
+    setForm((current) => ({
+      ...current,
+      attributes: current.attributes.map((attribute) =>
+        attribute.fieldDefinitionId === fieldDefinitionId ? { ...attribute, value } : attribute
+      )
+    }));
+  };
+
+  const applyCategoryChange = (nextCategoryId: string) => {
+    const previousCategory = categories.find((category) => category.id === form.categoryId);
+    const nextCategory = categories.find((category) => category.id === nextCategoryId);
+
+    setForm((current) => ({
+      ...current,
+      categoryId: nextCategoryId,
+      attributes: remapAttributes(current.attributes, previousCategory, nextCategory)
+    }));
+  };
+
+  const handleCategoryChange = (nextCategoryId: string) => {
+    if (nextCategoryId === form.categoryId) {
+      return;
+    }
+
+    const hasFilledAttributes = form.attributes.some((attribute) =>
+      typeof attribute.value === "boolean" ? true : String(attribute.value ?? "").trim().length > 0
+    );
+
+    if (!hasFilledAttributes) {
+      applyCategoryChange(nextCategoryId);
+      return;
+    }
+
+    setPending({
+      title: "Cambiar categoría",
+      description:
+        "Se van a recalcular los campos del producto según la nueva categoría. Se intentarán conservar solo los que sean compatibles.",
+      onConfirm: () => {
+        applyCategoryChange(nextCategoryId);
+        setPending(null);
+      }
+    });
+  };
+
   const removeImage = (index: number) => {
     setForm((current) => ({
       ...current,
@@ -179,14 +335,9 @@ export function AdminProductsManager({ initialProducts, categories, collections 
     setError(null);
     setLoading(true);
 
-    const largo = form.measurementsLargo.trim();
-    const alto = form.measurementsAlto.trim();
-    const measurements = largo && alto ? `${largo} x ${alto} cm` : undefined;
-
     const payload = {
       title: form.title.trim(),
       description: form.description.trim() || undefined,
-      measurements,
       priceArs: Math.round(Number(form.priceArs) * 100),
       stock: Number(form.stock),
       status: form.status,
@@ -196,6 +347,10 @@ export function AdminProductsManager({ initialProducts, categories, collections 
         url: image.url,
         altText: image.altText.trim() || undefined,
         sortOrder: index
+      })),
+      attributes: form.attributes.map((attribute) => ({
+        fieldDefinitionId: attribute.fieldDefinitionId,
+        value: attribute.value === "" ? null : attribute.value
       }))
     };
 
@@ -228,26 +383,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
 
   const editProduct = (product: AdminProduct) => {
     setError(null);
-    const measurementsParts = product.measurements?.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i);
-    setForm({
-      id: product.id,
-      title: product.title,
-      description: product.description ?? "",
-      measurementsLargo: measurementsParts?.[1] ?? "",
-      measurementsAlto: measurementsParts?.[2] ?? "",
-      priceArs: String(product.priceArs / 100),
-      stock: String(product.stock),
-      status: product.status,
-      categoryId: product.categoryId ?? "",
-      collectionId: product.collectionId ?? "",
-      images: product.images
-        .slice()
-        .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map((image) => ({
-          url: image.url,
-          altText: image.altText ?? ""
-        }))
-    });
+    setForm(categoryProductForm(product, categories));
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -265,7 +401,10 @@ export function AdminProductsManager({ initialProducts, categories, collections 
     setPending({
       title: "Eliminar producto",
       description: `¿Eliminar "${product.title}"? Se borrarán también sus imágenes. Esta acción no se puede deshacer.`,
-      onConfirm: () => { deleteProduct(product.id); setPending(null); },
+      onConfirm: () => {
+        void deleteProduct(product.id);
+        setPending(null);
+      }
     });
   };
 
@@ -274,7 +413,10 @@ export function AdminProductsManager({ initialProducts, categories, collections 
     setPending({
       title: "Quitar imagen",
       description: `¿Quitar "${name}" del producto? Si guardás el formulario, la imagen se eliminará definitivamente.`,
-      onConfirm: () => { removeImage(index); setPending(null); },
+      onConfirm: () => {
+        removeImage(index);
+        setPending(null);
+      }
     });
   };
 
@@ -337,32 +479,6 @@ export function AdminProductsManager({ initialProducts, categories, collections 
               />
             </div>
 
-            <div className="field">
-              <label className="label">Medidas</label>
-              <div className="row" style={{ alignItems: "center", gap: 8 }}>
-                <input
-                  type="number"
-                  min={1}
-                  className="input"
-                  style={{ width: 80 }}
-                  value={form.measurementsLargo}
-                  onChange={(event) => setForm((current) => ({ ...current, measurementsLargo: event.target.value }))}
-                  placeholder="Largo"
-                />
-                <span className="muted">x</span>
-                <input
-                  type="number"
-                  min={1}
-                  className="input"
-                  style={{ width: 80 }}
-                  value={form.measurementsAlto}
-                  onChange={(event) => setForm((current) => ({ ...current, measurementsAlto: event.target.value }))}
-                  placeholder="Alto"
-                />
-                <span className="muted">cm</span>
-              </div>
-            </div>
-
             <div className="row">
               <div className="field" style={{ flex: 1 }}>
                 <label className="label">Precio (ARS)</label>
@@ -411,12 +527,12 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                 <select
                   className="input"
                   value={form.categoryId}
-                  onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))}
+                  onChange={(event) => handleCategoryChange(event.target.value)}
                 >
                   <option value="">Sin categoría</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </select>
@@ -430,13 +546,97 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                   onChange={(event) => setForm((current) => ({ ...current, collectionId: event.target.value }))}
                 >
                   <option value="">Sin colección</option>
-                  {collections.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                  {collections.map((collection) => (
+                    <option key={collection.id} value={collection.id}>
+                      {collection.name}
                     </option>
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="field">
+              <div className="stack" style={{ gap: "0.4rem" }}>
+                <label className="label">Características del producto</label>
+                <p className="muted" style={{ margin: 0 }}>
+                  {selectedCategory
+                    ? `La categoría "${selectedCategory.name}" define estos campos.`
+                    : "Seleccioná una categoría para cargar campos específicos."}
+                </p>
+              </div>
+
+              {form.attributes.length === 0 ? (
+                <p className="muted" style={{ marginTop: "0.6rem" }}>
+                  No hay campos dinámicos para completar.
+                </p>
+              ) : (
+                <div className="stack" style={{ marginTop: "0.75rem", gap: "0.9rem" }}>
+                  {form.attributes.map((attribute) => (
+                    <div key={attribute.fieldDefinitionId} className="field">
+                      <label className="label">
+                        {attribute.label}
+                        {attribute.required ? " *" : ""}
+                        {attribute.unit ? ` (${attribute.unit})` : ""}
+                      </label>
+
+                      {attribute.type === "TEXT" && (
+                        <input
+                          className="input"
+                          value={typeof attribute.value === "string" ? attribute.value : ""}
+                          onChange={(event) => updateAttributeValue(attribute.fieldDefinitionId, event.target.value)}
+                        />
+                      )}
+
+                      {attribute.type === "NUMBER" && (
+                        <input
+                          type="number"
+                          step="any"
+                          className="input"
+                          value={typeof attribute.value === "string" ? attribute.value : ""}
+                          onChange={(event) => updateAttributeValue(attribute.fieldDefinitionId, event.target.value)}
+                        />
+                      )}
+
+                      {attribute.type === "SELECT" && (
+                        <select
+                          className="input"
+                          value={typeof attribute.value === "string" ? attribute.value : ""}
+                          onChange={(event) => updateAttributeValue(attribute.fieldDefinitionId, event.target.value)}
+                        >
+                          <option value="">Seleccionar</option>
+                          {attribute.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      {attribute.type === "BOOLEAN" && (
+                        <select
+                          className="input"
+                          value={attribute.value === null ? "" : attribute.value ? "true" : "false"}
+                          onChange={(event) =>
+                            updateAttributeValue(
+                              attribute.fieldDefinitionId,
+                              event.target.value === "" ? null : event.target.value === "true"
+                            )
+                          }
+                        >
+                          <option value="">Seleccionar</option>
+                          <option value="true">Sí</option>
+                          <option value="false">No</option>
+                        </select>
+                      )}
+
+                      <p className="muted" style={{ margin: "0.35rem 0 0" }}>
+                        {attribute.showInCatalog ? "Visible en catálogo" : "Oculto en catálogo"} ·{" "}
+                        {attribute.showInDetail ? "Visible en detalle" : "Oculto en detalle"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="field">
@@ -471,6 +671,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                         alt={image.altText || `Imagen ${index + 1}`}
                         width={240}
                         height={240}
+                        sizes="(max-width: 700px) 100vw, 180px"
                         className="image-upload-preview"
                       />
                       <input
@@ -517,7 +718,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
                 <th>Título</th>
                 <th>Categoría</th>
                 <th>Colección</th>
-                <th>Medidas</th>
+                <th>Características</th>
                 <th>Estado</th>
                 <th>Stock</th>
                 <th>Precio</th>
@@ -527,43 +728,50 @@ export function AdminProductsManager({ initialProducts, categories, collections 
             <tbody>
               {products.map((product) => {
                 const thumb = product.images.slice().sort((a, b) => a.sortOrder - b.sortOrder)[0];
-                const categoryName = categories.find((c) => c.id === product.categoryId)?.name ?? "-";
-                const collectionName = collections.find((c) => c.id === product.collectionId)?.name ?? "-";
+                const categoryName = categories.find((category) => category.id === product.categoryId)?.name ?? "-";
+                const collectionName = collections.find((collection) => collection.id === product.collectionId)?.name ?? "-";
+
                 return (
-                <tr key={product.id}>
-                  <td>
-                    {thumb ? (
-                      <Image
-                        src={thumb.url}
-                        alt={thumb.altText || product.title}
-                        width={180}
-                        height={180}
-                        style={{ objectFit: "cover", borderRadius: 6, display: "block" }}
-                      />
-                    ) : (
-                      <div style={{ width: 180, height: 180, background: "var(--color-border)", borderRadius: 6 }} />
-                    )}
-                  </td>
-                  <td style={{ verticalAlign: "middle" }}>{product.title}</td>
-                  <td style={{ verticalAlign: "middle" }}>{categoryName}</td>
-                  <td style={{ verticalAlign: "middle" }}>{collectionName}</td>
-                  <td style={{ verticalAlign: "middle" }}>{product.measurements || "-"}</td>
-                  <td style={{ verticalAlign: "middle" }}>{{ ACTIVE: "Activo", ARCHIVED: "Archivado" }[product.status]}</td>
-                  <td style={{ verticalAlign: "middle" }}>{product.stock}</td>
-                  <td style={{ verticalAlign: "middle" }}>{formatArs(product.priceArs)}</td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    <div className="row">
-                      <button className="button button-ghost" onClick={() => editProduct(product)}>
-                        Editar
-                      </button>
-                      <button className="button button-ghost" onClick={() => confirmDeleteProduct(product)}>
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  <tr key={product.id}>
+                    <td>
+                      {thumb ? (
+                        <Image
+                          src={thumb.url}
+                          alt={thumb.altText || product.title}
+                          width={180}
+                          height={180}
+                          sizes="180px"
+                          style={{ objectFit: "cover", borderRadius: 6, display: "block", width: "180px", height: "180px" }}
+                        />
+                      ) : (
+                        <div style={{ width: 180, height: 180, background: "var(--color-border)", borderRadius: 6 }} />
+                      )}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>{product.title}</td>
+                    <td style={{ verticalAlign: "middle" }}>{categoryName}</td>
+                    <td style={{ verticalAlign: "middle" }}>{collectionName}</td>
+                    <td style={{ verticalAlign: "middle", minWidth: 220 }}>
+                      {product.catalogAttributesSummary || product.measurements || "-"}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      {{ ACTIVE: "Activo", ARCHIVED: "Archivado" }[product.status]}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>{product.stock}</td>
+                    <td style={{ verticalAlign: "middle" }}>{formatArs(product.priceArs)}</td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      <div className="row">
+                        <button className="button button-ghost" onClick={() => editProduct(product)}>
+                          Editar
+                        </button>
+                        <button className="button button-ghost" onClick={() => confirmDeleteProduct(product)}>
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 );
               })}
+
               {products.length === 0 && (
                 <tr>
                   <td colSpan={9} className="muted">

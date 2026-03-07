@@ -5,6 +5,8 @@ import type { ProductDTO } from "@/types";
 import { OrnateFrameImage } from "./ornate-frame-image";
 
 export function ProductCard({ product }: { product: ProductDTO }) {
+  const catalogAttributes = product.attributes.filter((attribute) => attribute.showInCatalog);
+
   return (
     <article className="product-card">
       <Link href={`/products/${product.slug}`} className="product-card-media-wrap">
@@ -22,7 +24,11 @@ export function ProductCard({ product }: { product: ProductDTO }) {
         <h3 className="product-title">
           <Link href={`/products/${product.slug}`}>{product.title}</Link>
         </h3>
-        {product.measurements && <span className="muted">Medidas: {product.measurements}</span>}
+        {catalogAttributes.map((attribute) => (
+          <span key={attribute.fieldDefinitionId} className="muted">
+            {attribute.label}: {attribute.displayValue}
+          </span>
+        ))}
         <span className="price">{formatArs(product.priceArs)}</span>
         <div className="product-card-foot">
           <span className={`pill ${product.stock > 0 ? "pill-ok" : "pill-warn"}`}>

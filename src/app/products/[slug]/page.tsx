@@ -5,6 +5,8 @@ import { AddToCartButton } from "@/components/add-to-cart-button";
 import { OrnateFrameImage } from "@/components/ornate-frame-image";
 import { formatArs } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
+import { buildProductAttributes } from "@/lib/product-attributes";
+import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
 
 type Params = {
   params: {
@@ -15,6 +17,8 @@ type Params = {
 export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({ params }: Params) {
+  await backfillLegacyMeasurements(prisma);
+
   const product = await prisma.product.findFirst({
     where: {
       slug: params.slug,
@@ -22,8 +26,15 @@ export default async function ProductDetailPage({ params }: Params) {
     },
     include: {
       images: { orderBy: { sortOrder: "asc" } },
-      category: true,
-      collection: true
+      category: {
+        include: {
+          fieldDefinitions: {
+            orderBy: { sortOrder: "asc" }
+          }
+        }
+      },
+      collection: true,
+      fieldValues: true
     }
   });
 
@@ -32,6 +43,8 @@ export default async function ProductDetailPage({ params }: Params) {
   }
 
   const cover = product.images[0]?.url || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab";
+  const detailAttributes = buildProductAttributes(product.category?.fieldDefinitions ?? [], product.fieldValues, product.measurements)
+    .filter((attribute) => attribute.showInDetail);
 
   return (
     <section className="stack">
@@ -87,10 +100,14 @@ export default async function ProductDetailPage({ params }: Params) {
                   )}
                 </div>
               )}
-              {product.measurements && (
-                <p className="muted" style={{ margin: 0, fontSize: "1.05rem" }}>
-                  Medidas: {product.measurements}
-                </p>
+              {detailAttributes.length > 0 && (
+                <div className="stack" style={{ gap: "0.45rem" }}>
+                  {detailAttributes.map((attribute) => (
+                    <p key={attribute.fieldDefinitionId} className="muted" style={{ margin: 0, fontSize: "1.05rem" }}>
+                      {attribute.label}: {attribute.displayValue}
+                    </p>
+                  ))}
+                </div>
               )}
               <div className="price" style={{ fontSize: "1.75rem" }}>
                 {formatArs(product.priceArs)}

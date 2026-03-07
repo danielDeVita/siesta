@@ -16,6 +16,13 @@ enum ProductStatus {
   ARCHIVED
 }
 
+enum CategoryFieldType {
+  TEXT
+  NUMBER
+  SELECT
+  BOOLEAN
+}
+
 enum OrderStatus {
   PENDING_PAYMENT
   PAID
@@ -60,12 +67,13 @@ model AdminUser {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id               String                    @id @default(cuid())
+  name             String
+  slug             String                    @unique
+  products         Product[]
+  fieldDefinitions CategoryFieldDefinition[]
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
 
   @@map("categories")
 }
@@ -97,12 +105,51 @@ model Product {
   category           Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   collection         Collection?         @relation(fields: [collectionId], references: [id], onDelete: SetNull)
   images             ProductImage[]
+  fieldValues        ProductFieldValue[]
   orderItems         OrderItem[]
   inventoryMovements InventoryMovement[]
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
 
   @@map("products")
+}
+
+model CategoryFieldDefinition {
+  id            String             @id @default(cuid())
+  categoryId    String             @map("category_id")
+  key           String
+  label         String
+  type          CategoryFieldType
+  required      Boolean            @default(false)
+  unit          String?
+  optionsJson   Json?              @map("options_json")
+  showInCatalog Boolean            @default(false) @map("show_in_catalog")
+  showInDetail  Boolean            @default(true) @map("show_in_detail")
+  sortOrder     Int                @default(0) @map("sort_order")
+  isActive      Boolean            @default(true) @map("is_active")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+  category      Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  fieldValues   ProductFieldValue[]
+
+  @@unique([categoryId, key])
+  @@index([categoryId, sortOrder])
+  @@map("category_field_definitions")
+}
+
+model ProductFieldValue {
+  id                        String                  @id @default(cuid())
+  productId                 String                  @map("product_id")
+  categoryFieldDefinitionId String                  @map("category_field_definition_id")
+  valueJson                 Json                    @map("value_json")
+  createdAt                 DateTime                @default(now()) @map("created_at")
+  updatedAt                 DateTime                @updatedAt @map("updated_at")
+  product                   Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  categoryFieldDefinition   CategoryFieldDefinition @relation(fields: [categoryFieldDefinitionId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, categoryFieldDefinitionId])
+  @@index([categoryFieldDefinitionId])
+  @@map("product_field_values")
 }
 
 model ProductImage {
