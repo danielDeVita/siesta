@@ -36,7 +36,7 @@ export function SiteFooter() {
         </div>
         <div className="footer-col footer-col-policies">
           <strong>Políticas</strong>
-          <p>Solo retiro. Te contactamos por WhatsApp cuando esté listo.</p>
+          <p>Solo retiro. Te contactamos cuando esté listo.</p>
           <p>Horarios de retiro: lun a vie, 15:00 a 19:00.</p>
         </div>
       </div>
