@@ -16,12 +16,12 @@ export function SiteFooter() {
             </a>
             <a
               className="footer-contact-item"
-              href="https://wa.me/5491100000000"
+              href="https://wa.me/5491164541770"
               target="_blank"
               rel="noreferrer"
             >
               <Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" />
-              +54 9 11 0000-0000
+              +54 9 11 6454 1770
             </a>
             <a
               className="footer-contact-item"
