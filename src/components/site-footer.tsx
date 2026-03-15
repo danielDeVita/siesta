@@ -10,9 +10,28 @@ export function SiteFooter() {
         <div className="footer-col footer-col-contact">
           <strong>Contacto</strong>
           <div className="footer-contact-row">
-            <p className="footer-contact-item"><Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" /> hola@sine.com</p>
-            <p className="footer-contact-item"><Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" /> +54 9 11 0000-0000</p>
-            <p className="footer-contact-item"><Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" /> @sine.bolsas</p>
+            <a className="footer-contact-item" href="mailto:holaa.sine@gmail">
+              <Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" />
+              holaa.sine@gmail
+            </a>
+            <a
+              className="footer-contact-item"
+              href="https://wa.me/5491100000000"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Image src={phoneImg} alt="WhatsApp" width={52} height={52} className="footer-icon" />
+              +54 9 11 0000-0000
+            </a>
+            <a
+              className="footer-contact-item"
+              href="https://www.instagram.com/sine.es.sine/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" />
+              @sine.es.sine
+            </a>
           </div>
         </div>
         <div className="footer-col footer-col-policies">

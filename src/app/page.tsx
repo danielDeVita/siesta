@@ -1,7 +1,9 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { toProductDTO } from "@/lib/mappers";
 import { CatalogGrid } from "@/components/catalog-grid";
 import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
+import sineSImg from "@/assets/brand/S.png";
 export const dynamic = "force-dynamic";
 
 type SearchParams = { cat?: string; col?: string };
@@ -33,7 +35,20 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
   return (
     <section className="stack home-stack">
       <header className="hero">
-        <h1 className="home-logo">Sine</h1>
+        <h1 className="home-logo">
+          <span className="sr-only">Sine</span>
+          <Image
+            src={sineSImg}
+            alt=""
+            aria-hidden="true"
+            className="home-logo-initial"
+            sizes="(max-width: 700px) 72px, 120px"
+            priority
+          />
+          <span className="home-logo-rest" aria-hidden="true">
+            ine
+          </span>
+        </h1>
         <p className="home-manifesto">Salón del imaginario nostálgico y estético</p>
       </header>
 
