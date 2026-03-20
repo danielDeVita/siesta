@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jsonError } from "@/lib/api";
-import type { OrderDTO } from "@/types";
+import type { PublicOrderDTO } from "@/types";
 
 type Params = {
   params: {
@@ -23,14 +23,9 @@ export async function GET(_: NextRequest, { params }: Params) {
     return jsonError("Order not found", 404);
   }
 
-  const payload: OrderDTO = {
-    id: order.id,
+  const payload: PublicOrderDTO = {
     publicCode: order.publicCode,
     status: order.status,
-    customerName: order.customerName,
-    customerEmail: order.customerEmail,
-    customerWhatsapp: order.customerWhatsapp,
-    pickupNotes: order.pickupNotes,
     subtotalAmount: order.subtotalAmount,
     totalAmount: order.totalAmount,
     currency: "ARS",

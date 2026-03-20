@@ -5,14 +5,14 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
-import type { OrderDTO } from "@/types";
+import type { PublicOrderDTO } from "@/types";
 import { ORDER_STATUS_LABELS } from "@/lib/order";
 
 export function CheckoutSuccessView() {
   const searchParams = useSearchParams();
   const code = searchParams.get("order");
   const { clearCart } = useCart();
-  const [order, setOrder] = useState<OrderDTO | null>(null);
+  const [order, setOrder] = useState<PublicOrderDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function CheckoutSuccessView() {
     const run = async () => {
       try {
         const response = await fetch(`/api/orders/${code}`);
-        const data = (await response.json()) as { order?: OrderDTO; error?: string };
+        const data = (await response.json()) as { order?: PublicOrderDTO; error?: string };
         if (!response.ok || !data.order) {
           throw new Error(data.error ?? "No se pudo cargar el pedido.");
         }

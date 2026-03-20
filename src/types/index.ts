@@ -74,14 +74,9 @@ export type CreatePreferenceResponse = {
   orderPublicCode: string;
 };
 
-export type OrderDTO = {
-  id: string;
+export type PublicOrderDTO = {
   publicCode: string;
   status: OrderStatus;
-  customerName: string;
-  customerEmail: string;
-  customerWhatsapp: string;
-  pickupNotes: string | null;
   subtotalAmount: number;
   totalAmount: number;
   currency: "ARS";
