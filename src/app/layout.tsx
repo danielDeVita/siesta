@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { CartProvider } from "@/components/cart-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { appConfig } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
 const bodyFont = DM_Sans({
@@ -25,12 +26,13 @@ const scriptFont = Rochester({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appConfig.appUrl),
   title: "· Sine ·",
   description: "Bolsas estampadas con diseño original.",
   openGraph: {
     title: "· Sine ·",
     description: "Bolsas estampadas con diseño original.",
-    images: [{ url: "https://res.cloudinary.com/dy10rxkdv/image/upload/v1771701443/siesta/products/ogxf0xkfpcmxhwecxieg.jpg" }],
+    images: [{ url: "/logo.jpeg" }],
     type: "website"
   }
 };
@@ -41,7 +43,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     prisma.collection.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
   ]);
 
-  const themeScript = `(function(){var t=localStorage.getItem('siesta-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');})();`;
+  const themeScript = `(function(){var t=localStorage.getItem('siesta-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');document.documentElement.style.colorScheme=d?'dark':'light';})();`;
 
   return (
     <html lang="es" suppressHydrationWarning>

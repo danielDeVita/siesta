@@ -6,6 +6,7 @@ import { adminProductUpsertSchema } from "@/lib/validators";
 import { jsonError } from "@/lib/api";
 import { prepareNormalizedProductAttributes, serializeAdminProduct } from "@/lib/admin-products";
 import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
+import { resolveCloudinaryPublicId } from "@/lib/cloudinary";
 
 async function buildUniqueSlugFromTitle(title: string): Promise<string> {
   const baseSlug = slugify(title) || "producto";
@@ -25,6 +26,20 @@ async function buildUniqueSlugFromTitle(title: string): Promise<string> {
     slugCandidate = `${baseSlug}-${suffix}`;
     suffix += 1;
   }
+}
+
+function buildProductImageCreateData(
+  images: Array<{ url: string; publicId?: string | null; altText?: string; sortOrder?: number }>
+) {
+  return images.map((image, index) => ({
+    url: image.url,
+    publicId: resolveCloudinaryPublicId({
+      publicId: image.publicId,
+      url: image.url
+    }),
+    altText: image.altText || null,
+    sortOrder: image.sortOrder ?? index
+  }));
 }
 
 export async function GET() {
@@ -95,11 +110,7 @@ export async function POST(request: NextRequest) {
           createdByAdminId: session.id,
           images: {
             createMany: {
-              data: input.images.map((image, index) => ({
-                url: image.url,
-                altText: image.altText || null,
-                sortOrder: image.sortOrder ?? index
-              }))
+              data: buildProductImageCreateData(input.images)
             }
           }
         }

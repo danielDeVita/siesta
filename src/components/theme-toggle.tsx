@@ -12,6 +12,7 @@ function applyTheme(theme: Theme) {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const dark = theme === "dark" || (theme === "system" && prefersDark);
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
 }
 
 export function ThemeToggle() {

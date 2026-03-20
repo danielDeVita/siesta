@@ -1,8 +1,14 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "AdminRole" AS ENUM ('ADMIN');
 
 -- CreateEnum
-CREATE TYPE "ProductStatus" AS ENUM ('ACTIVE', 'DRAFT', 'ARCHIVED');
+CREATE TYPE "ProductStatus" AS ENUM ('ACTIVE', 'ARCHIVED');
+
+-- CreateEnum
+CREATE TYPE "CategoryFieldType" AS ENUM ('TEXT', 'NUMBER', 'SELECT', 'BOOLEAN');
 
 -- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING_PAYMENT', 'PAID', 'READY_FOR_PICKUP', 'COMPLETED', 'CANCELLED', 'PAYMENT_FAILED');
@@ -32,14 +38,39 @@ CREATE TABLE "admin_users" (
 );
 
 -- CreateTable
+CREATE TABLE "categories" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "collections" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "collections_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "products" (
     "id" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
+    "measurements" TEXT,
     "price_ars" INTEGER NOT NULL,
     "stock" INTEGER NOT NULL,
-    "status" "ProductStatus" NOT NULL DEFAULT 'DRAFT',
+    "status" "ProductStatus" NOT NULL DEFAULT 'ACTIVE',
+    "category_id" TEXT,
+    "collection_id" TEXT,
     "created_by_admin_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -48,10 +79,43 @@ CREATE TABLE "products" (
 );
 
 -- CreateTable
+CREATE TABLE "category_field_definitions" (
+    "id" TEXT NOT NULL,
+    "category_id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "type" "CategoryFieldType" NOT NULL,
+    "required" BOOLEAN NOT NULL DEFAULT false,
+    "unit" TEXT,
+    "options_json" JSONB,
+    "show_in_catalog" BOOLEAN NOT NULL DEFAULT false,
+    "show_in_detail" BOOLEAN NOT NULL DEFAULT true,
+    "sort_order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "category_field_definitions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "product_field_values" (
+    "id" TEXT NOT NULL,
+    "product_id" TEXT NOT NULL,
+    "category_field_definition_id" TEXT NOT NULL,
+    "value_json" JSONB NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "product_field_values_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "product_images" (
     "id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
+    "public_id" TEXT,
     "alt_text" TEXT,
     "sort_order" INTEGER NOT NULL DEFAULT 0,
 
@@ -125,7 +189,25 @@ CREATE TABLE "inventory_movements" (
 CREATE UNIQUE INDEX "admin_users_email_key" ON "admin_users"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "categories_slug_key" ON "categories"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "collections_slug_key" ON "collections"("slug");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "products_slug_key" ON "products"("slug");
+
+-- CreateIndex
+CREATE INDEX "category_field_definitions_category_id_sort_order_idx" ON "category_field_definitions"("category_id", "sort_order");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "category_field_definitions_category_id_key_key" ON "category_field_definitions"("category_id", "key");
+
+-- CreateIndex
+CREATE INDEX "product_field_values_category_field_definition_id_idx" ON "product_field_values"("category_field_definition_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "product_field_values_product_id_category_field_definition_i_key" ON "product_field_values"("product_id", "category_field_definition_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "product_images_product_id_sort_order_key" ON "product_images"("product_id", "sort_order");
@@ -152,6 +234,21 @@ CREATE INDEX "inventory_movements_order_item_id_idx" ON "inventory_movements"("o
 ALTER TABLE "products" ADD CONSTRAINT "products_created_by_admin_id_fkey" FOREIGN KEY ("created_by_admin_id") REFERENCES "admin_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "products" ADD CONSTRAINT "products_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "products" ADD CONSTRAINT "products_collection_id_fkey" FOREIGN KEY ("collection_id") REFERENCES "collections"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "category_field_definitions" ADD CONSTRAINT "category_field_definitions_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "product_field_values" ADD CONSTRAINT "product_field_values_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "product_field_values" ADD CONSTRAINT "product_field_values_category_field_definition_id_fkey" FOREIGN KEY ("category_field_definition_id") REFERENCES "category_field_definitions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -171,3 +268,4 @@ ALTER TABLE "inventory_movements" ADD CONSTRAINT "inventory_movements_order_item
 
 -- AddForeignKey
 ALTER TABLE "inventory_movements" ADD CONSTRAINT "inventory_movements_created_by_admin_id_fkey" FOREIGN KEY ("created_by_admin_id") REFERENCES "admin_users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

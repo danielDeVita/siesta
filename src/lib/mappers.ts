@@ -8,6 +8,7 @@ import type {
 } from "@prisma/client";
 import type { ProductDTO, ProductDetailDTO } from "@/types";
 import { buildProductAttributes } from "@/lib/product-attributes";
+import { resolveCloudinaryPublicId } from "@/lib/cloudinary";
 
 type ProductWithImages = Product & {
   images: ProductImage[];
@@ -47,6 +48,7 @@ export function toProductDetailDTO(product: ProductWithImages): ProductDetailDTO
       .map((image) => ({
         id: image.id,
         url: image.url,
+        publicId: resolveCloudinaryPublicId({ publicId: image.publicId, url: image.url }),
         altText: image.altText,
         sortOrder: image.sortOrder
       }))

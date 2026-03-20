@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { definitionToDTO, validateAndNormalizeProductAttributes } from "@/lib/category-fields";
 import { buildProductAttributes, summarizeAttributes } from "@/lib/product-attributes";
+import { resolveCloudinaryPublicId } from "@/lib/cloudinary";
 import type {
   AdminProductAttributeInput,
   CategoryFieldDefinitionDTO,
@@ -120,6 +121,7 @@ export type SerializableAdminProduct = {
   images: Array<{
     id: string;
     url: string;
+    publicId: string | null;
     altText: string | null;
     sortOrder: number;
   }>;
@@ -158,6 +160,7 @@ export function serializeAdminProduct(product: ProductForSerialization): Seriali
     images: product.images.map((image) => ({
       id: image.id,
       url: image.url,
+      publicId: resolveCloudinaryPublicId({ publicId: image.publicId, url: image.url }),
       altText: image.altText,
       sortOrder: image.sortOrder
     })),

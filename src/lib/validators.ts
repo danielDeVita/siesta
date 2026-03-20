@@ -21,6 +21,7 @@ export const adminLoginSchema = z.object({
 
 export const adminProductImageSchema = z.object({
   url: z.string().url(),
+  publicId: z.string().min(1).optional().nullable(),
   altText: z.string().max(160).optional(),
   sortOrder: z.number().int().nonnegative().optional()
 });

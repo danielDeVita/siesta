@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { toProductDTO } from "@/lib/mappers";
 import { CatalogGrid } from "@/components/catalog-grid";
@@ -37,13 +36,13 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
       <header className="hero">
         <h1 className="home-logo">
           <span className="sr-only">Sine</span>
-          <Image
-            src={sineSImg}
-            alt=""
+          <span
             aria-hidden="true"
             className="home-logo-initial"
-            sizes="(max-width: 700px) 72px, 120px"
-            priority
+            style={{
+              WebkitMaskImage: `url(${sineSImg.src})`,
+              maskImage: `url(${sineSImg.src})`
+            }}
           />
           <span className="home-logo-rest" aria-hidden="true">
             ine

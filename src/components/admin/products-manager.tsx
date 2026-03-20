@@ -23,6 +23,7 @@ type AdminProduct = {
   images: Array<{
     id: string;
     url: string;
+    publicId: string | null;
     altText: string | null;
     sortOrder: number;
   }>;
@@ -56,6 +57,7 @@ type UploadResponse = {
 
 type FormImage = {
   url: string;
+  publicId: string | null;
   altText: string;
 };
 
@@ -155,6 +157,7 @@ function categoryProductForm(product: AdminProduct, categories: CategoryOption[]
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((image) => ({
         url: image.url,
+        publicId: image.publicId,
         altText: image.altText ?? ""
       })),
     attributes: buildAttributeState(getActiveDefinitions(category), product.attributes)
@@ -240,6 +243,8 @@ export function AdminProductsManager({ initialProducts, categories, collections 
       for (const file of files) {
         const body = new FormData();
         body.append("file", file);
+        body.append("categoryId", form.categoryId);
+        body.append("productTitle", form.title);
 
         const response = await fetch("/api/admin/uploads", {
           method: "POST",
@@ -254,6 +259,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
 
         uploaded.push({
           url: data.image.url,
+          publicId: data.image.publicId,
           altText: filenameToAltText(file.name)
         });
       }
@@ -345,6 +351,7 @@ export function AdminProductsManager({ initialProducts, categories, collections 
       collectionId: form.collectionId || null,
       images: form.images.map((image, index) => ({
         url: image.url,
+        publicId: image.publicId,
         altText: image.altText.trim() || undefined,
         sortOrder: index
       })),

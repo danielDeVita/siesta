@@ -1,7 +1,7 @@
 import Image from "next/image";
 import emailImg from "@/assets/email.png";
 import phoneImg from "@/assets/phone.png";
-import paintingImg from "@/assets/painting.png";
+import cameraImg from "@/assets/camera.png";
 
 export function SiteFooter() {
   return (
@@ -29,7 +29,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noreferrer"
             >
-              <Image src={paintingImg} alt="Instagram" width={52} height={52} className="footer-icon" />
+              <Image src={cameraImg} alt="Instagram" width={52} height={52} className="footer-icon" />
               @sine.es.sine
             </a>
           </div>

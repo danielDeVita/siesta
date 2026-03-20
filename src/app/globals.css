@@ -17,9 +17,9 @@
   --muted-color: #8A6860;
 
   /* Acento — Beauty Bush (rosa empolvado cálido) */
-  --accent: #CC7070;
-  --accent-strong: #F7A7B7;
-  --accent-light: #FAEAE6;
+  --accent: #F7A7B7;
+  --accent-strong: #D78498;
+  --accent-light: #FDECF1;
 
   /* Dorado — para precios y elementos "money" */
   --gold: #C9A028;
@@ -56,6 +56,10 @@
 html, body {
   margin: 0;
   padding: 0;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
@@ -357,20 +361,33 @@ main {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 0.05em;
+  gap: 0;
   text-align: center;
-  color: var(--accent-strong);
+  color: #F7A7B7;
 }
 
 .home-logo-initial {
-  width: auto;
+  display: inline-block;
+  width: clamp(2.13rem, 5.33vw, 3.6rem);
   height: clamp(3.2rem, 8vw, 5.4rem);
   flex: 0 0 auto;
+  transform: translateY(0.08em);
+  background-color: #F7A7B7;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
 }
 
 .home-logo-rest {
   display: inline-block;
   line-height: 0.88;
+  color: #F7A7B7;
+  -webkit-text-fill-color: #F7A7B7;
 }
 
 .home-manifesto {
@@ -1100,17 +1117,18 @@ main {
 
 /* ————— Dark mode ————— */
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg: #180E0A;
   --surface: #2A1C16;
   --surface-soft: #3A2820;
   --surface-strong: #C87070;
 
   --ink: #F5EAE2;
-  --muted-color: #C0A090;
+  --muted-color: #D5B2BC;
 
-  --accent: #D48080;
-  --accent-strong: #E89898;
-  --accent-light: #3A2020;
+  --accent: #F7A7B7;
+  --accent-strong: #FFC1CD;
+  --accent-light: #40232B;
 
   --gold: #D4A830;
   --gold-strong: #E0BE50;
@@ -1317,6 +1335,7 @@ main {
   }
 
   .home-logo-initial {
+    width: clamp(1.93rem, 9.33vw, 2.47rem);
     height: clamp(2.9rem, 14vw, 3.7rem);
   }
 

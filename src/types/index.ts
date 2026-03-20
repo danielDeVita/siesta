@@ -46,6 +46,7 @@ export type ProductDTO = {
 export type ProductImageDTO = {
   id: string;
   url: string;
+  publicId?: string | null;
   altText: string | null;
   sortOrder: number;
 };
@@ -96,6 +97,7 @@ export type OrderDTO = {
 
 export type AdminProductImageInput = {
   url: string;
+  publicId?: string | null;
   altText?: string;
   sortOrder?: number;
 };

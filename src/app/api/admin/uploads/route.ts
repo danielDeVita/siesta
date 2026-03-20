@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/admin-api";
 import { uploadImageToCloudinary } from "@/lib/cloudinary";
 import { jsonError } from "@/lib/api";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,8 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
+  const categoryIdValue = formData?.get("categoryId");
+  const productTitleValue = formData?.get("productTitle");
 
   if (!(file instanceof File)) {
     return jsonError("No se recibió imagen.", 400);
@@ -30,7 +33,21 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const uploaded = await uploadImageToCloudinary(file);
+    const categoryId = typeof categoryIdValue === "string" ? categoryIdValue.trim() : "";
+    const productTitle = typeof productTitleValue === "string" ? productTitleValue.trim() : "";
+
+    const category = categoryId
+      ? await prisma.category.findUnique({
+          where: { id: categoryId },
+          select: { slug: true }
+        })
+      : null;
+
+    const uploaded = await uploadImageToCloudinary(file, {
+      categorySlug: category?.slug ?? null,
+      productTitle
+    });
+
     return NextResponse.json({ image: uploaded }, { status: 201 });
   } catch (error) {
     console.error(error);
