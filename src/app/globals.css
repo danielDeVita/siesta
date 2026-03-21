@@ -353,41 +353,16 @@ main {
 
 .home-logo {
   margin: 0;
-  font-family: var(--font-script), cursive;
-  font-size: clamp(2.8rem, 7.5vw, 5rem);
-  line-height: 0.95;
-  font-weight: 400;
-  letter-spacing: 0.01em;
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-  gap: 0;
+  line-height: 0;
   text-align: center;
-  color: #F7A7B7;
 }
 
-.home-logo-initial {
-  display: inline-block;
-  width: clamp(2.13rem, 5.33vw, 3.6rem);
-  height: clamp(3.2rem, 8vw, 5.4rem);
-  flex: 0 0 auto;
-  transform: translateY(0.08em);
-  background-color: #F7A7B7;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-mode: alpha;
-  mask-mode: alpha;
-}
-
-.home-logo-rest {
-  display: inline-block;
-  line-height: 0.88;
-  color: #F7A7B7;
-  -webkit-text-fill-color: #F7A7B7;
+.home-logo-image {
+  display: block;
+  width: clamp(12.5rem, 30vw, 16.25rem);
+  height: auto;
 }
 
 .home-manifesto {
@@ -1331,12 +1306,11 @@ main {
   }
 
   .home-logo {
-    font-size: clamp(2.35rem, 13vw, 3rem);
+    line-height: 0;
   }
 
-  .home-logo-initial {
-    width: clamp(1.93rem, 9.33vw, 2.47rem);
-    height: clamp(2.9rem, 14vw, 3.7rem);
+  .home-logo-image {
+    width: clamp(10.25rem, 55vw, 13rem);
   }
 
   .home-manifesto {

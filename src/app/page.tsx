@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { toProductDTO } from "@/lib/mappers";
 import { CatalogGrid } from "@/components/catalog-grid";
 import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
-import sineSImg from "@/assets/brand/S.png";
+import sineWordmarkImg from "@/assets/Sine.png";
 export const dynamic = "force-dynamic";
 
 type SearchParams = { cat?: string; col?: string };
@@ -36,17 +36,14 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
       <header className="hero">
         <h1 className="home-logo">
           <span className="sr-only">Sine</span>
-          <span
+          <img
+            src={sineWordmarkImg.src}
+            width={sineWordmarkImg.width}
+            height={sineWordmarkImg.height}
+            alt=""
             aria-hidden="true"
-            className="home-logo-initial"
-            style={{
-              WebkitMaskImage: `url(${sineSImg.src})`,
-              maskImage: `url(${sineSImg.src})`
-            }}
+            className="home-logo-image"
           />
-          <span className="home-logo-rest" aria-hidden="true">
-            ine
-          </span>
         </h1>
         <p className="home-manifesto">Salón del imaginario nostálgico y estético</p>
       </header>
