@@ -40,6 +40,20 @@ export function SiteFooter() {
           <p>Horarios de retiro: lun a vie, 15:00 a 19:00.</p>
         </div>
       </div>
+      <div className="container footer-credits">
+        <p>
+          Diseño e ilustraciones:{" "}
+          <a
+            href="https://www.instagram.com/solbrennerlujan/"
+            target="_blank"
+            rel="noreferrer"
+            className="footer-credit-link"
+          >
+            @solbrennerlujan
+          </a>
+        </p>
+        <p>Diseño Web: Daniel De Vita</p>
+      </div>
     </footer>
   );
 }
