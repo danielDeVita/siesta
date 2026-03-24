@@ -361,8 +361,9 @@ main {
 
 .home-logo-image {
   display: block;
-  width: clamp(12.5rem, 30vw, 16.25rem);
-  height: auto;
+  width: auto;
+  height: clamp(6.6rem, 13vw, 8.6rem);
+  max-width: min(100%, 44rem);
 }
 
 .home-manifesto {
@@ -1336,7 +1337,8 @@ main {
   }
 
   .home-logo-image {
-    width: clamp(10.25rem, 55vw, 13rem);
+    height: clamp(5.25rem, 18vw, 6.6rem);
+    max-width: min(100%, 24rem);
   }
 
   .home-manifesto {
