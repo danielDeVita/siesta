@@ -1,5 +1,5 @@
 import Image from "next/image";
-import emailImg from "@/assets/email.png";
+import typewriterImg from "@/assets/typewriter.png";
 import phoneImg from "@/assets/phone.png";
 import cameraImg from "@/assets/camera.png";
 
@@ -11,7 +11,7 @@ export function SiteFooter() {
           <strong>Contacto</strong>
           <div className="footer-contact-row">
             <a className="footer-contact-item" href="mailto:holaa.sine@gmail">
-              <Image src={emailImg} alt="Email" width={52} height={52} className="footer-icon" />
+              <Image src={typewriterImg} alt="Email" width={52} height={52} className="footer-icon" />
               holaa.sine@gmail
             </a>
             <a
