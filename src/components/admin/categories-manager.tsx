@@ -24,6 +24,7 @@ type CategoryRecord = {
   id: string;
   name: string;
   slug: string;
+  description: string;
   productCount: number;
   fieldDefinitions: CategoryFieldDefinition[];
 };
@@ -49,6 +50,7 @@ type EditableField = {
 type FormState = {
   id?: string;
   name: string;
+  description: string;
   fieldDefinitions: EditableField[];
 };
 
@@ -70,6 +72,7 @@ function categoryToForm(category: CategoryRecord): FormState {
   return {
     id: category.id,
     name: category.name,
+    description: category.description,
     fieldDefinitions: category.fieldDefinitions.map((field) => ({
       clientId: field.id,
       id: field.id,
@@ -89,6 +92,7 @@ function categoryToForm(category: CategoryRecord): FormState {
 function buildPayload(form: FormState) {
   return {
     name: form.name.trim(),
+    description: form.description.trim(),
     fieldDefinitions: form.fieldDefinitions
       .filter((field) => field.label.trim().length > 0)
       .map((field, index) => ({
@@ -115,7 +119,11 @@ function buildPayload(form: FormState) {
 export function CategoriesManager({ categories: initialCategories }: Props) {
   const [categories, setCategories] = useState(initialCategories);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCategories[0]?.id ?? null);
-  const [form, setForm] = useState<FormState>(initialCategories[0] ? categoryToForm(initialCategories[0]) : { name: "", fieldDefinitions: [] });
+  const [form, setForm] = useState<FormState>(
+    initialCategories[0]
+      ? categoryToForm(initialCategories[0])
+      : { name: "", description: "", fieldDefinitions: [] }
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null);
@@ -131,6 +139,7 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
     setError(null);
     setForm({
       name: "",
+      description: "",
       fieldDefinitions: []
     });
   };
@@ -365,6 +374,17 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
               />
             </div>
 
+            <div className="field">
+              <label className="label">Descripción</label>
+              <textarea
+                className="input textarea"
+                value={form.description}
+                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                placeholder="Texto breve que resume la categoría y también se usa para metadata SEO."
+                required
+              />
+            </div>
+
             <div className="stack" style={{ gap: "0.75rem" }}>
               <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
                 <h3 style={{ margin: 0 }}>Campos de la categoría</h3>
@@ -494,7 +514,11 @@ export function CategoriesManager({ categories: initialCategories }: Props) {
             {error && <p className="feedback-error">{error}</p>}
 
             <div className="row">
-              <button className="button button-primary" type="submit" disabled={loading || form.name.trim().length < 2}>
+              <button
+                className="button button-primary"
+                type="submit"
+                disabled={loading || form.name.trim().length < 2 || form.description.trim().length < 2}
+              >
                 {loading ? "Guardando..." : form.id ? "Guardar cambios" : "Crear categoría"}
               </button>
             </div>

@@ -62,6 +62,7 @@ export const adminCategoryFieldDefinitionSchema = z.object({
 
 export const adminCategorySchema = z.object({
   name: z.string().min(2).max(80),
+  description: z.string().min(2).max(180),
   fieldDefinitions: z.array(adminCategoryFieldDefinitionSchema).default([])
 });
 

@@ -9,7 +9,7 @@ import chartImg from "@/assets/chart.png";
 import menuImg from "@/assets/menu.png";
 import adminImg from "@/assets/admin.png";
 
-type NavItem = { id: string; name: string };
+type NavItem = { id: string; name: string; slug?: string };
 
 type SiteHeaderProps = {
   categories: NavItem[];
@@ -93,7 +93,7 @@ export function SiteHeader({ categories, collections }: SiteHeaderProps) {
                     <div className="nav-dropdown-items">
                       <Link href="/" onClick={closeAll}>Todas</Link>
                       {categories.map((cat) => (
-                        <Link key={cat.id} href={`/?cat=${cat.id}`} onClick={closeAll}>
+                        <Link key={cat.id} href={`/categorias/${cat.slug ?? cat.id}`} onClick={closeAll}>
                           {cat.name}
                         </Link>
                       ))}

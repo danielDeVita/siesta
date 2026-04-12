@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { appConfig } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_OG_IMAGE_PATH } from "@/lib/seo";
 
 const bodyFont = DM_Sans({
   variable: "--font-body",
@@ -27,19 +28,29 @@ const scriptFont = Rochester({
 
 export const metadata: Metadata = {
   metadataBase: new URL(appConfig.appUrl),
-  title: "· Sine ·",
-  description: "Bolsas estampadas con diseño original.",
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`
+  },
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "· Sine ·",
-    description: "Bolsas estampadas con diseño original.",
-    images: [{ url: "/logo.jpeg" }],
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [{ url: SITE_OG_IMAGE_PATH }],
+    siteName: SITE_NAME,
     type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [SITE_OG_IMAGE_PATH]
   }
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [categories, collections] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
     prisma.collection.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
   ]);
 

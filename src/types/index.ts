@@ -129,5 +129,6 @@ export type AdminCategoryFieldDefinitionInput = {
 
 export type AdminCategoryUpsertInput = {
   name: string;
+  description: string;
   fieldDefinitions: AdminCategoryFieldDefinitionInput[];
 };

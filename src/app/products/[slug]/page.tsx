@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,6 +8,13 @@ import { formatArs } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
 import { buildProductAttributes } from "@/lib/product-attributes";
 import { backfillLegacyMeasurements } from "@/lib/legacy-measurements-backfill";
+import {
+  buildAbsoluteUrl,
+  buildProductSeoDescription,
+  buildProductStructuredData,
+  SITE_NAME,
+  SITE_OG_IMAGE_PATH
+} from "@/lib/seo";
 
 type Params = {
   params: {
@@ -16,12 +24,10 @@ type Params = {
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductDetailPage({ params }: Params) {
-  await backfillLegacyMeasurements(prisma);
-
-  const product = await prisma.product.findFirst({
+async function getActiveProductBySlug(slug: string) {
+  return prisma.product.findFirst({
     where: {
-      slug: params.slug,
+      slug,
       status: "ACTIVE"
     },
     include: {
@@ -37,17 +43,84 @@ export default async function ProductDetailPage({ params }: Params) {
       fieldValues: true
     }
   });
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const product = await getActiveProductBySlug(params.slug);
+
+  if (!product) {
+    return {
+      title: "Producto no encontrado",
+      robots: {
+        index: false,
+        follow: false
+      }
+    };
+  }
+
+  const description = buildProductSeoDescription({
+    title: product.title,
+    description: product.description,
+    categoryName: product.category?.name
+  });
+  const image = product.images[0]?.url ?? SITE_OG_IMAGE_PATH;
+  const canonical = `/products/${product.slug}`;
+
+  return {
+    title: product.title,
+    description,
+    alternates: {
+      canonical
+    },
+    openGraph: {
+      title: `${product.title} | ${SITE_NAME}`,
+      description,
+      url: canonical,
+      images: [{ url: image }],
+      type: "website"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.title} | ${SITE_NAME}`,
+      description,
+      images: [image]
+    }
+  };
+}
+
+export default async function ProductDetailPage({ params }: Params) {
+  await backfillLegacyMeasurements(prisma);
+
+  const product = await getActiveProductBySlug(params.slug);
 
   if (!product) {
     notFound();
   }
 
   const cover = product.images[0]?.url || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab";
+  const productDescription = buildProductSeoDescription({
+    title: product.title,
+    description: product.description,
+    categoryName: product.category?.name
+  });
   const detailAttributes = buildProductAttributes(product.category?.fieldDefinitions ?? [], product.fieldValues, product.measurements)
     .filter((attribute) => attribute.showInDetail);
+  const productStructuredData = buildProductStructuredData({
+    title: product.title,
+    description: productDescription,
+    image: cover.startsWith("http") ? cover : buildAbsoluteUrl(cover),
+    urlPath: `/products/${product.slug}`,
+    categoryName: product.category?.name,
+    priceArs: product.priceArs,
+    stock: product.stock
+  });
 
   return (
     <section className="stack">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData) }}
+      />
       <Link href="/" className="muted">
         ← Volver al catálogo
       </Link>

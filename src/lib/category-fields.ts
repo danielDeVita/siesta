@@ -68,6 +68,7 @@ type SerializableCategory = {
   id: string;
   name: string;
   slug: string;
+  description: string;
   productCount: number;
   fieldDefinitions: CategoryFieldDefinitionDTO[];
 };
@@ -76,6 +77,7 @@ type CategoryWithDefinitionsAndCount = {
   id: string;
   name: string;
   slug: string;
+  description: string;
   fieldDefinitions: CategoryFieldDefinition[];
   _count: {
     products: number;
@@ -87,6 +89,7 @@ export function serializeAdminCategory(category: CategoryWithDefinitionsAndCount
     id: category.id,
     name: category.name,
     slug: category.slug,
+    description: category.description,
     productCount: category._count.products,
     fieldDefinitions: category.fieldDefinitions.map(definitionToDTO)
   };

@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "public";
-
 -- CreateEnum
 CREATE TYPE "AdminRole" AS ENUM ('ADMIN');
 
@@ -42,6 +39,7 @@ CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -268,4 +266,3 @@ ALTER TABLE "inventory_movements" ADD CONSTRAINT "inventory_movements_order_item
 
 -- AddForeignKey
 ALTER TABLE "inventory_movements" ADD CONSTRAINT "inventory_movements_created_by_admin_id_fkey" FOREIGN KEY ("created_by_admin_id") REFERENCES "admin_users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { CartView } from "@/components/cart-view";
 
 export const metadata: Metadata = {
   robots: {
@@ -8,6 +7,6 @@ export const metadata: Metadata = {
   }
 };
 
-export default function CartPage() {
-  return <CartView />;
+export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

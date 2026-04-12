@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
 
   const input = parsed.data;
   const name = input.name.trim();
+  const description = input.description.trim();
   const slug = await buildUniqueSlug(name);
   let normalizedDefinitions;
 
@@ -67,7 +68,11 @@ export async function POST(request: NextRequest) {
   try {
     const category = await prisma.$transaction(async (tx) => {
       const createdCategory = await tx.category.create({
-        data: { name, slug }
+        data: {
+          name,
+          slug,
+          description
+        }
       });
 
       if (normalizedDefinitions.length > 0) {

@@ -70,6 +70,7 @@ model Category {
   id               String                    @id @default(cuid())
   name             String
   slug             String                    @unique
+  description      String
   products         Product[]
   fieldDefinitions CategoryFieldDefinition[]
   createdAt        DateTime                  @default(now()) @map("created_at")

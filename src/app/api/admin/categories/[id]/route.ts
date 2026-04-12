@@ -69,6 +69,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   const input = parsed.data;
   const name = input.name.trim();
+  const description = input.description.trim();
   const slug = await buildUniqueSlug(name, params.id);
   let normalizedDefinitions;
 
@@ -83,7 +84,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const category = await prisma.$transaction(async (tx) => {
       await tx.category.update({
         where: { id: params.id },
-        data: { name, slug }
+        data: {
+          name,
+          slug,
+          description
+        }
       });
 
       const incomingIds = new Set(normalizedDefinitions.map((definition) => definition.id).filter(Boolean));

@@ -30,6 +30,7 @@ export default async function AdminCategoriesPage() {
         id: category.id,
         name: category.name,
         slug: category.slug,
+        description: category.description,
         productCount: category._count.products,
         fieldDefinitions: category.fieldDefinitions.map(definitionToDTO)
       }))}
